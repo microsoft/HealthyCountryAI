@@ -1,5 +1,8 @@
 # Healthy Habitat AI
 
+### Machine Learning Workstation
+* Install [Azure Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/)
+* Install [Power BI Desktop](https://powerbi.microsoft.com/en-us/desktop/)
 * Install [Anaconda](https://docs.anaconda.com/anaconda/install/)
 * Clone `https://github.com/svanbodegraven/HealthyHabitatAI.git`
 * `cd HealthyHabitatAI`
@@ -11,3 +14,7 @@ conda activate HealthyHabitatAI
 conda install notebook ipykernel
 ipython kernel install --user
 ```
+
+## Field Workstation
+* Install [Azure Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/)
+* Install [Power BI Desktop](https://powerbi.microsoft.com/en-us/desktop/)
