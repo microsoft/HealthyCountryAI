@@ -1,0 +1,8 @@
+name: HealthyHabitatAI
+dependencies:
+  - azure-cognitiveservices-vision-customvision
+  - matplotlib
+  - python=3.6.5
+  - Pillow
+  - pip:
+    - azureml-sdk[notebooks,automl]
