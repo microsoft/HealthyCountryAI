@@ -3,6 +3,16 @@
 ### Overview
 The Healthy Habitat AI project consists of four models developed using CustomVision.ai and Azure Machine Learning Service using images and multi-spectral data, collected by rangers using DJI Mavic 2s, from sites in Kakadu National Park. The models increase the area a ranger is able to assess, by converting large volumes of data into metrics significant to the health of the land.
 
+### Models
+
+CustomVision.ai -
+* Para grass - Classification
+* Magpie Geese - Object Detection
+
+Azure Machine Learning Service -
+* Para grass - Semantic Segmentation (U-Net)
+* Para grass - Multi-spectral (5-bands)
+
 ### Data Preparation
 The project consists of two Storage accounts for data collection -
 * Healthy Habitat Animals (healthyhabitatanimals), and
@@ -25,15 +35,6 @@ Data preparation follows the process -
 * 
 
 
-### Projects
-
-CustomVision.ai -
-* Para grass - Classification
-* Magpie Geese - Object Detection
-
-Azure Machine Learning Service -
-* Para grass - Semantic Segmentation (U-Net)
-* Para grass - Multi-spectral (5-bands)
 
 ### Machine Learning Workstation
 * Install [Azure Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/)
