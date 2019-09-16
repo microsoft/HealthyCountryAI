@@ -34,7 +34,16 @@ Data preparation follows the process -
 * Copy images from a DJI Mavic 2 to the local workstation
 * 
 
+...
 
+Classes -
+* Para grass
+* Burnt Para-grass
+* Dense Para-grass
+* Dead Para-grass
+* Wet Para-grass
+* Tree
+* Water
 
 ### Machine Learning Workstation
 * Install [Azure Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/)
