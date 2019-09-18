@@ -5,13 +5,13 @@ The Healthy Habitat AI project consists of four models developed using CustomVis
 
 The models consist of -
 
-CustomVision.ai -
-* Para grass - Classification (304 px x 228 px Tiles)
-* Magpie Geese - Object Detection
+CustomVision.ai:
+* Para grass - Classification (304 x 228 px Tiles)
+* Magpie Geese - Object Detection (304 x 228 px Tiles)
 
-Azure Machine Learning Service -
+Azure Machine Learning Service:
 * Para grass - Semantic Segmentation (U-Net)
-* Para grass - Multi-spectral (5-bands)
+* Para grass - Multi-spectral (5-bands) (U-Net)
 
 ### Data Preparation
 The project consists of two Storage accounts for data collection -
@@ -29,10 +29,21 @@ Data is divided into folders named using the *site* the data was collected at an
 * ubir-kunumeleng
 * ubir-wurrkeng
 
+Then in each folder, the YYY-MM-DD-HHMM collection occured, for example -
+* 2019-04-03-1050
+
+After copying data a DJI Mavic 2 to the local workstation
+
 Data preparation follows the process -
 
 * Copy images from a DJI Mavic 2 to the local workstation
-* 
+* Sort...
+    * Exclude /Movies
+    * Exclude .*.JPG
+    * ...
+* Upload...
+* Create Tiles...
+* Label...
 
 ...
 
