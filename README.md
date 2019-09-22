@@ -32,34 +32,24 @@ Data is divided into folders named using the *site* the data was collected at an
 * ubir-kunumeleng
 * ubir-wurrkeng
 
-Then in each folder, the YYY-MM-DD-HHMM collection occured, for example -
+Then in each folder, the YYY-MM-DD-HHMM that the collection occured, for example -
 * 2019-04-03-1050
 
-Images are copied from a DJI Mavic 2 to the local workstation matching the same folder structure -
+Images are copied from a DJI Mavic 2 to either -
 
-* Drive:\HealthyHabitatAI\healthyhabitatanimals, and
+* Drive:\HealthyHabitatAI\healthyhabitatanimals
+    * YYY-MM-DD-HHMM
+
+Or
+
 * Drive:\HealthyHabitatAI\healthyhabitatparragrass
+    * YYY-MM-DD-HHMM
 
-Sorted manually
+Images in Drive:\HealthyHabitatAI\healthyhabitatanimals are sorted and copied manually.
 
-...
-
-
-
+Azure Storage Explorer is then used to copy data to the corresponding Storage account and container.
 
 
-
-
-Data preparation follows the process -
-
-* Copy images from a DJI Mavic 2 to the local workstation
-* Sort...
-    * Exclude /Movies
-    * Exclude .*.JPG
-    * ...
-* Upload...
-* Create Tiles...
-* Label...
 
 ...
 
