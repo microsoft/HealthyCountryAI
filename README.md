@@ -14,6 +14,9 @@ Azure Machine Learning Service:
 * Para grass - Multi-spectral (5-bands) (U-Net)
 
 ### Data Preparation
+
+![](Healthy_Habitat_AI_Data_Preparation_v1.0_20-09-2019.jpg)
+
 The project consists of two Storage accounts for data collection -
 * Healthy Habitat Animals (healthyhabitatanimals), and
 * Healthy Habitat Para grass (healthyhabitatparragrass)
@@ -32,7 +35,20 @@ Data is divided into folders named using the *site* the data was collected at an
 Then in each folder, the YYY-MM-DD-HHMM collection occured, for example -
 * 2019-04-03-1050
 
-After copying data a DJI Mavic 2 to the local workstation
+Images are copied from a DJI Mavic 2 to the local workstation matching the same folder structure -
+
+* Drive:\HealthyHabitatAI\healthyhabitatanimals, and
+* Drive:\HealthyHabitatAI\healthyhabitatparragrass
+
+Sorted manually
+
+...
+
+
+
+
+
+
 
 Data preparation follows the process -
 
