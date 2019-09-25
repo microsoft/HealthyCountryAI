@@ -1,7 +1,7 @@
 # Healthy Habitat AI
 
 ### Overview
-The Healthy Habitat AI project consists of four models developed using CustomVision.ai and Azure Machine Learning Service using images and multi-spectral data, collected by rangers using DJI Mavic 2s, from sites in Kakadu National Park. The models increase the area a ranger is able to assess, by converting large volumes of data into metrics significant to the health of the land.
+The Healthy Habitat AI project consists of four models developed using CustomVision.ai and Azure Machine Learning Service, using images and multi-spectral data, collected by rangers using DJI Mavic 2s, from sites in Kakadu National Park. The models increase the area a ranger is able to assess, by converting large volumes of data into metrics significant to the health of the land.
 
 The models consist of -
 
@@ -17,13 +17,17 @@ Azure Machine Learning Service:
 
 ![](Healthy_Habitat_AI_Data_Preparation_v1.0_20-09-2019.jpg)
 
+A DJI Mavic Pro is connected to a Microsoft Surface, and images are dragged onto the surface of the seasonal wheel matching the *site* the data was collected at and the *season* the data was collected during, which automatically synchronizes the data to Storage.
+
+![](UX.png)
+
 The project consists of two Storage accounts for data collection -
 * Healthy Habitat Animals (healthyhabitatanimals), and
 * Healthy Habitat Para grass (healthyhabitatparragrass)
 
 Each account uses Blobs only.
 
-Data is divided into folders named using the *site* the data was collected at and the *season* the data was collected during, for example -
+Data is divided into containers named using the combination of *site* and *season* matching the seasonal wheel, for example -
 
 * cannon-hill-kunumeleng
 * cannon-hill-wurrkeng
@@ -32,24 +36,8 @@ Data is divided into folders named using the *site* the data was collected at an
 * ubir-kunumeleng
 * ubir-wurrkeng
 
-Then in each folder, the YYY-MM-DD-HHMM that the collection occured, for example -
+Then in each container, the YYY-MM-DD-HHMM that the collection occured, for example -
 * 2019-04-03-1050
-
-Images are copied from a DJI Mavic 2 to either -
-
-* Drive:\HealthyHabitatAI\healthyhabitatanimals
-    * YYY-MM-DD-HHMM
-
-Or
-
-* Drive:\HealthyHabitatAI\healthyhabitatparragrass
-    * YYY-MM-DD-HHMM
-
-Images in Drive:\HealthyHabitatAI\healthyhabitatanimals are sorted and copied manually.
-
-Azure Storage Explorer is then used to copy data to the corresponding Storage account and container.
-
-
 
 ...
 
