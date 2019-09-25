@@ -1,0 +1,118 @@
+﻿<Window x:Class="HealthyHabitat.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SixSeasons"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="800" Width="800" AllowsTransparency="True" Background="Transparent" WindowStyle="None"
+        ResizeMode="NoResize">
+    <Grid MouseDown="Grid_MouseDown">
+        <Image x:Name="image" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Source="Images/SixSeasons.png" />
+        <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Name="seasonKaap" Fill="#FFC59080" Data="M749.58 207.54l-.08 0L448.37 374.8A54.44 54.44 0 0 0 403 350.5h-.35L407.7 6C554.13 7.9 681.57 88.55 749.58 207.54Z"
+              Opacity="0"
+              DragEnter="season_OnDragEnter" 
+              DragLeave="season_OnDragLeave" 
+              DragOver="season_OnDragOver" 
+              Drop="season_OnDrop"
+              AllowDrop="True"
+              Tag="Kaap">
+            <Path.RenderTransform>
+                <TranslateTransform X="-2.5" Y="-5.5"/>
+            </Path.RenderTransform>
+        </Path>
+        <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Name="seasonOnchanWayath" Fill="#FFE38758" Data="M802 405.5H457.49c0-.16 0-.33 0-.49a54.24 54.24 0 0 0-9.12-30.19l301.4-166.92A397.68 397.68 0 0 1 802 405.5Z"
+              Opacity="0"
+              DragEnter="season_OnDragEnter" 
+              DragLeave="season_OnDragLeave" 
+              DragOver="season_OnDragOver" 
+              Drop="season_OnDrop"
+              AllowDrop="True" 
+              Tag="Onchan Wayath">
+            <Path.RenderTransform>
+                <TranslateTransform X="-2.5" Y="-5.5"/>
+            </Path.RenderTransform>
+        </Path>
+        <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Name="seasonOnchanMin" Fill="#FFEAA27A" Data="M802 405.5C802 626 623.41 804.73 403 805l1.44-345.52q2.38-.06 4.71-.33a54.48 54.48 0 0 0 48.35-53.64H802Z"
+              Opacity="0"
+              DragEnter="season_OnDragEnter" 
+              DragLeave="season_OnDragLeave" 
+              DragOver="season_OnDragOver" 
+              Drop="season_OnDrop"
+              AllowDrop="True"
+              Tag="Onchan Min">
+            <Path.RenderTransform>
+                <TranslateTransform X="-2.5" Y="-5.5"/>
+            </Path.RenderTransform>
+        </Path>
+        <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Name="seasonKayamanmaal" Fill="#FF99CBCC" Data="M404.36 459.48 402.73 805h-.23c-146.19 0-274-78.52-343.66-195.68L356.23 433A54.46 54.46 0 0 0 403 459.5Z"
+              Opacity="0"
+              DragEnter="season_OnDragEnter" 
+              DragLeave="season_OnDragLeave" 
+              DragOver="season_OnDragOver" 
+              Drop="season_OnDrop"
+              AllowDrop="True"
+              Tag="Kayamanmaal">
+            <Path.RenderTransform>
+                <TranslateTransform X="-2.5" Y="-5.5"/>
+            </Path.RenderTransform>
+        </Path>
+        <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Name="seasonKayamamPungNganthLing" Fill="#FF8F8584" Data="M355.77 432.21 57.29 606.7a400 400 0 0 1-1.84-399.21L355.76 377.81a54.55 54.55 0 0 0 0 54.4Z"
+              Opacity="0"
+              DragEnter="season_OnDragEnter" 
+              DragLeave="season_OnDragLeave" 
+              DragOver="season_OnDragOver" 
+              Drop="season_OnDrop"
+              AllowDrop="True"
+              Tag="Kayamam Pung Nganth-Ling">
+            <Path.RenderTransform>
+                <TranslateTransform X="-2.5" Y="-5.5"/>
+            </Path.RenderTransform>
+        </Path>
+        <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Name="seasonUmKaapak" Fill="#FFAE6755" Data="M402.5 350.5h0a54.19 54.19 0 0 0-28.7 8.46h0L302.51 233l-.15-.26L205.52 57.86A397.65 397.65 0 0 1 402.5 6c.94 0 1.87 0 2.8 0Z"
+              Opacity="0"
+              DragEnter="season_OnDragEnter" 
+              DragLeave="season_OnDragLeave" 
+              DragOver="season_OnDragOver" 
+              Drop="season_OnDrop"
+              AllowDrop="True"
+              Tag="Um Kaapak">
+            <Path.RenderTransform>
+                <TranslateTransform X="-2.5" Y="-5.5"/>
+            </Path.RenderTransform>
+        </Path>
+        <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Name="SeasonThurpak" Fill="#FF9A4133" Data="M372.65 359.73a54.67 54.67 0 0 0-16.73 17.8L55.61 207.2A401.53 401.53 0 0 1 203.86 58.8l98.5 174 .15.26Z"
+              Opacity="0"
+              DragEnter="season_OnDragEnter" 
+              DragLeave="season_OnDragLeave" 
+              DragOver="season_OnDragOver" 
+              Drop="season_OnDrop"
+              AllowDrop="True"
+              Tag="Thurpak">
+            <Path.RenderTransform>
+                <TranslateTransform X="-2.5" Y="-5.5"/>
+            </Path.RenderTransform>
+        </Path>
+        <Button x:Name="btn_close" Content="Close" HorizontalAlignment="Right" Margin="0,0,0,0" VerticalAlignment="Top" Width="100" Height="100" Click="Btn_close_Click">
+            <Button.Template>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Grid>
+                        <Ellipse Fill="White" Stroke="#FF9A4133" StrokeThickness="10"/>
+                        <ContentPresenter 
+                            Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                            ContentTemplate="{TemplateBinding ContentTemplate}" >
+                            <ContentPresenter.Resources>
+                                <Style TargetType="{x:Type TextBlock}">
+                                    <Setter Property="FontSize" Value="24" />
+                                    <Setter Property="FontWeight" Value="Bold" />
+                                    <Setter Property="FontFamily" Value="Arial" />
+                                    <Setter Property="Foreground" Value="#FF9A4133" />
+                                </Style>
+                            </ContentPresenter.Resources>
+                        </ContentPresenter>
+                    </Grid>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+    </Grid>
+</Window>
