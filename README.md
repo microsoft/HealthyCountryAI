@@ -27,7 +27,7 @@ Storage consists of two accounts for data collection -
 
 Each account uses Blobs only.
 
-Data is automatically divided into containers named using the combination of *site* and *season* matching the section of the seasonal wheel, for example -
+Data is automatically divided into containers named using the combination of *site* and *season* matching the section of the seasonal wheel images were dragged onto, for example -
 
 * cannon-hill-kunumeleng
 * cannon-hill-wurrkeng
