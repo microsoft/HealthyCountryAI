@@ -82,7 +82,7 @@ namespace HealthyHabitat
                 // Note that you can have more than one file.
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
 
-                CopyFilesToLocalCache(files, "Camp Hill", Season);
+                CopyFilesToLocalCache(files, "cannon-hill", Season);
                 // Handle the file move and initiate az-copy task to blog storage
 
                 InitiateAzCopy(); // This needs some sort of callback
@@ -94,13 +94,17 @@ namespace HealthyHabitat
         private void CopyFilesToLocalCache(string[] files, string location, string season)
         {
             string cacheLocation = ConfigurationSettings.AppSettings["localCache"] ?? AppDomain.CurrentDomain.BaseDirectory;
-            string destination = System.IO.Path.Combine(cacheLocation, location, season);
-
-            System.IO.Directory.CreateDirectory(destination);
 
             foreach (string file in files)
             {
+                DateTime lastModifiedDate = System.IO.File.GetLastWriteTime(file);
+
+                string destination = System.IO.Path.Combine(cacheLocation, string.Format("{0}-{1}", location, season), lastModifiedDate.ToString("yyyy'-'MM'-'dd'-'HH''mm"));
+
+                System.IO.Directory.CreateDirectory(destination);
+
                 string destinationFile = System.IO.Path.Combine(destination, System.IO.Path.GetFileName(file));
+                
                 System.IO.File.Copy(file, destinationFile, true);
             }
         }
