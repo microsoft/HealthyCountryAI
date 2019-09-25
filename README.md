@@ -17,17 +17,17 @@ Azure Machine Learning Service:
 
 ![](Healthy_Habitat_AI_Data_Preparation_v1.0_20-09-2019.jpg)
 
-A DJI Mavic Pro is connected to a Microsoft Surface, and images are dragged onto the section of a seasonal wheel matching the *site* the data was collected at and the *season* the data was collected during, which automatically synchronizes the data to Azure Storage.
+After connecting a DJI Mavic Pro to a Microsoft Surface, images are dragged onto the section of a seasonal wheel matching the *site* the data was collected at and the *season* the data was collected during, which automatically synchronizes the data to Azure Storage.
 
 ![](UX.png)
 
-The project consists of two Storage accounts for data collection -
+Storage consists of two accounts for data collection -
 * Healthy Habitat Animals (healthyhabitatanimals), and
 * Healthy Habitat Para grass (healthyhabitatparragrass)
 
 Each account uses Blobs only.
 
-Data is divided into containers named using the combination of *site* and *season* matching the seasonal wheel, for example -
+Data is automatically divided into containers named using the combination of *site* and *season* matching the section of the seasonal wheel, for example -
 
 * cannon-hill-kunumeleng
 * cannon-hill-wurrkeng
@@ -36,7 +36,7 @@ Data is divided into containers named using the combination of *site* and *seaso
 * ubir-kunumeleng
 * ubir-wurrkeng
 
-Then in each container, the YYY-MM-DD-HHMM that the collection occured, for example -
+Then by the YYY-MM-DD-HHMM the collection occured, for example -
 * 2019-04-03-1050
 
 ...
