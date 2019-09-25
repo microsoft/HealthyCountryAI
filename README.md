@@ -17,7 +17,7 @@ Azure Machine Learning Service:
 
 ![](Healthy_Habitat_AI_Data_Preparation_v1.0_20-09-2019.jpg)
 
-A DJI Mavic Pro is connected to a Microsoft Surface, and images are dragged onto the surface of a seasonal wheel, matching the *site* the data was collected at and the *season* the data was collected during, which automatically synchronizes the data to Azure Storage.
+A DJI Mavic Pro is connected to a Microsoft Surface, and images are dragged onto the section of a seasonal wheel matching the *site* the data was collected at and the *season* the data was collected during, which automatically synchronizes the data to Azure Storage.
 
 ![](UX.png)
 
