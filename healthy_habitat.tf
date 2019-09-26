@@ -1,7 +1,3 @@
-terraform {
-    backend "local" {}
-}
-
 # Configure the provider
 provider "azurerm" {
     version = "=1.27.0"
