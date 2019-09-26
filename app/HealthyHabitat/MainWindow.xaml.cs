@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -111,7 +112,31 @@ namespace HealthyHabitat
 
         private void InitiateAzCopy()
         {
+            StringBuilder command = new StringBuilder("azcopy cp \"[sourceDir]\" \"https://[account].blob.core.windows.net/[container]?[SAS]\" --recursive=true --put-md5");
+            string sourceDir = ConfigurationSettings.AppSettings["localCache"] ?? AppDomain.CurrentDomain.BaseDirectory;
+            string account = ConfigurationSettings.AppSettings["storageAccountName"];
+            string container = ConfigurationSettings.AppSettings["containerNamwe"];
+            string sas = ConfigurationSettings.AppSettings["sas"];
 
+            command.Replace("[sourceDir]", sourceDir);
+            command.Replace("[account]", account);
+            command.Replace("[container]", container);
+            command.Replace("[sas]", sas);
+
+            string location = "cd ./AzCopy";
+
+            using (Process cmd = new Process())
+            {
+                cmd.StartInfo.FileName = "cmd.exe";
+                cmd.StartInfo.RedirectStandardInput = true;
+                cmd.StartInfo.RedirectStandardOutput = true;
+                cmd.StartInfo.CreateNoWindow = false;
+                cmd.StartInfo.UseShellExecute = false;
+
+                cmd.Start();
+                cmd.StandardInput.WriteLine(location);
+                cmd.StandardInput.WriteLine(command);
+            }
         }
 
         private void Btn_close_Click(object sender, RoutedEventArgs e)
