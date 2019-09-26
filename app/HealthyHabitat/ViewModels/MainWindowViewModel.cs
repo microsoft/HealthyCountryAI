@@ -6,7 +6,9 @@
     using SixSeasons.Models;
     using System;
     using System.Collections.ObjectModel;
+    using System.Collections.Specialized;
     using System.ComponentModel;
+    using System.Configuration;
     using System.Linq;
     using System.Windows;
     using System.Windows.Input;
@@ -117,12 +119,21 @@
 
         public MainWindowViewModel(IDialogService dialogService)
         {
-            Locations = new ObservableCollection<Location>()
+            NameValueCollection locationSection = (NameValueCollection)ConfigurationManager.GetSection("locations");
+
+            Locations = new ObservableCollection<Location>();
+
+            foreach (var loc in locationSection.AllKeys)
             {
-                new Location(){ Id="cannon-hill", Name="Cannon Hill" },
-                new Location(){ Id="jabire-dreaming", Name="Jabire Dreaming" },
-                new Location(){ Id="ubir", Name="Ubir" }
-            };
+                Locations.Add(new Location() { Id = loc, Name = locationSection[loc] });
+            }
+
+            //Locations = new ObservableCollection<Location>()
+            //{
+            //    new Location(){ Id="cannon-hill", Name="Cannon Hill" },
+            //    new Location(){ Id="jabire-dreaming", Name="Jabire Dreaming" },
+            //    new Location(){ Id="ubir", Name="Ubir" }
+            //};
 
             this.dialogService = dialogService;
 
