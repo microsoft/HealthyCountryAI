@@ -1,8 +1,8 @@
 terraform {
   backend "azurerm" {
-    container_name       = "tstate"
-    storage_account_name = "tstate28432"
-    key                  = "terraform.tfstate"
+    //container_name       = "tstate"
+    //storage_account_name = "tstate28432"
+    //key                  = "terraform.tfstate"
   }
 }
 
@@ -55,7 +55,7 @@ resource "azurerm_key_vault" "kv" {
   tags = var.tags
 }
 
-# create Storage Account
+# create Storage Account for data
 resource "azurerm_storage_account" "sa" {
   name                     = "${var.prefix}sa"
   resource_group_name      = "${azurerm_resource_group.rg.name}"
@@ -63,6 +63,43 @@ resource "azurerm_storage_account" "sa" {
   account_tier             = "Standard"
   account_replication_type = "LRS"
   tags                     = var.tags
+}
+
+# create Storage Account for functions
+resource "azurerm_storage_account" "fnsa" {
+  name                     = "${var.prefix}fnsa"
+  resource_group_name      = "${azurerm_resource_group.rg.name}"
+  location                 = "${azurerm_resource_group.rg.location}"
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+  tags                     = var.tags
+}
+
+# create app service plan for functions
+resource "azurerm_app_service_plan" "fn" {
+  name                = "${var.prefix}fn"
+  resource_group_name = "${azurerm_resource_group.rg.name}"
+  location            = "${azurerm_resource_group.rg.location}"
+  kind                = "functionapp,linux"
+  sku {
+    tier = "Dynamic"
+    size = "Y1"
+  }
+}
+
+# create app service for functions
+resource "azurerm_function_app" "fn" {
+  name                      = "${var.prefix}fn"
+  resource_group_name       = "${azurerm_resource_group.rg.name}"
+  location                  = "${azurerm_resource_group.rg.location}"
+  app_service_plan_id       = "${azurerm_app_service_plan.fn.id}"
+  storage_connection_string = "${azurerm_storage_account.fnsa.primary_connection_string}"
+
+  app_settings {
+    APPINSIGHTS_INSTRUMENTATIONKEY = "${azurerm_application_insights.ai.instrumentation_key}"
+    FUNCTIONS_EXTENSION_VERSION = "~2"
+    FUNCTIONS_WORKER_RUNTIME = "python"
+  }
 }
 
 # create Application Insights
