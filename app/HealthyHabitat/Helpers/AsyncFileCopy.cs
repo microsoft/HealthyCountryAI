@@ -8,40 +8,48 @@
 
     public static class AsyncFileCopy
     {
-        public static async Task CopyFiles(Dictionary<string, string> files, Action<double> progressCallback)
+        public static async Task<bool> CopyFiles(Dictionary<string, string> files, Action<double> progressCallback)
         {
-            long total_size = files.Keys.Select(x => new FileInfo(x).Length).Sum();
-
-            long total_read = 0;
-
-            double progress_size = 10000.0;
-
-            foreach (var item in files)
+            try
             {
-                long total_read_for_file = 0;
+                long total_size = files.Keys.Select(x => new FileInfo(x).Length).Sum();
 
-                var from = item.Key;
-                var to = item.Value;
+                long total_read = 0;
 
-                using (var outStream = new FileStream(to, FileMode.Create, FileAccess.Write, FileShare.Read))
+                double progress_size = 100.0;
+
+                foreach (var item in files)
                 {
-                    using (var inStream = new FileStream(from, FileMode.Open, FileAccess.Read, FileShare.Read))
-                    {
-                        await CopyStream(inStream, outStream, x =>
-                        {
-                            total_read_for_file = x;
-                            progressCallback(((total_read + total_read_for_file) / (double)total_size) * progress_size);
-                        });
-                    }
-                }
+                    long total_read_for_file = 0;
 
-                total_read += total_read_for_file;
+                    var from = item.Key;
+                    var to = item.Value;
+
+                    using (var outStream = new FileStream(to, FileMode.Create, FileAccess.Write, FileShare.Read))
+                    {
+                        using (var inStream = new FileStream(from, FileMode.Open, FileAccess.Read, FileShare.Read))
+                        {
+                            await CopyStream(inStream, outStream, x =>
+                            {
+                                total_read_for_file = x;
+                                progressCallback(((total_read + total_read_for_file) / (double)total_size) * progress_size);
+                            });
+                        }
+                    }
+
+                    total_read += total_read_for_file;
+                }
             }
+            catch (Exception ex)
+            {
+                return false;
+            }
+            return true;
         }
 
         public static async Task CopyStream(Stream from, Stream to, Action<long> progress)
         {
-            int buffer_size = 10240;
+            int buffer_size = 102400;
 
             byte[] buffer = new byte[buffer_size];
 

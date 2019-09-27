@@ -17,6 +17,7 @@
     using System.IO;
     using System.Linq;
     using System.Text;
+    using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Input;
 
@@ -156,8 +157,6 @@
                 ProgressVisible = true;
 
                 CopyFilesToLocalCache(this.Files.ToArray<string>(), this.SelectedLocation.Id, this.SelectedSeason);
-
-                InitiateAzCopy();
             });
 
             ExitCommand = new RelayCommand(() =>
@@ -186,7 +185,26 @@
 
             double size = 0;
 
-            foreach (string filename in files)
+            List<string> manifest = new List<string>();
+
+            // Test for folders and flatten into files
+            foreach(string filename in files)
+            {
+                FileAttributes attr = File.GetAttributes(filename);
+
+                if (attr.HasFlag(FileAttributes.Directory))
+                {
+                    string[] filePaths = Directory.GetFiles(filename, "*.*", SearchOption.AllDirectories);
+
+                    manifest.AddRange(filePaths);
+                }
+                else
+                {
+                    manifest.Add(filename);
+                }
+            }
+
+            foreach (string filename in manifest)
             {
                 DateTime lastModifiedDate = System.IO.File.GetLastWriteTime(filename);
 
@@ -206,11 +224,13 @@
             await AsyncFileCopy.CopyFiles(fileCopyManifest, prog => ProgressValue = prog);
 
             ProgressVisible = false;
+
+            InitiateAzCopy();
         }
 
-        private async void InitiateAzCopy()
+        private async Task InitiateAzCopy()
         {
-            StringBuilder command = new StringBuilder("azcopy cp \"[sourceDir]\" \"[sasUri]\" --recursive=true --put-md5");
+            StringBuilder command = new StringBuilder("/C azcopy cp \"[sourceDir]\" \"[sasUri]\" --recursive=true --put-md5");
 
             string sourceDir = ConfigurationManager.AppSettings["localCache"] ?? AppDomain.CurrentDomain.BaseDirectory;
             string account = ConfigurationManager.AppSettings["storageAccountName"];
@@ -231,19 +251,25 @@
             command.Replace("[sourceDir]", sourceDir);
             command.Replace("[sasUri]", sasUri);
 
-            string location = "cd " + AppDomain.CurrentDomain.BaseDirectory + "AzCopy";
+            string location = AppDomain.CurrentDomain.BaseDirectory + "AzCopy";
 
             using (Process cmd = new Process())
             {
+                cmd.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal;
+
                 cmd.StartInfo.FileName = "cmd.exe";
-                cmd.StartInfo.CreateNoWindow = true;
-                cmd.StartInfo.UseShellExecute = false;
-                cmd.StartInfo.RedirectStandardInput = true;
-                cmd.StartInfo.RedirectStandardOutput = true;
+
+                cmd.StartInfo.WorkingDirectory = location;
+                //cmd.StartInfo.CreateNoWindow = true;
+                //cmd.StartInfo.UseShellExecute = false;
+                //cmd.StartInfo.RedirectStandardInput = true;
+                //cmd.StartInfo.RedirectStandardOutput = true;
+
+                cmd.StartInfo.Arguments = command.ToString(); ;
 
                 cmd.Start();
-                cmd.StandardInput.WriteLine(location);
-                cmd.StandardInput.WriteLine(command);
+                //cmd.StandardInput.WriteLine(location);
+                //cmd.StandardInput.WriteLine(command);
             }
 
             // Todo
