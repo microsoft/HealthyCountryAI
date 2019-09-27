@@ -90,3 +90,5 @@ target/
 
 # Terraform providers
 /.terraform/
+
+app/HealthyHabitat/obj/
