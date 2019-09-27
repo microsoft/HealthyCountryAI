@@ -8,7 +8,7 @@ terraform {
 
 # configure the provider
 provider "azurerm" {
-  version = "~> 1.34"
+  version = "~> 1.34" // was 1.35.0 but this caused an error on Azure Pipelines
 
   //use_msi = true
 }
@@ -80,7 +80,7 @@ resource "azurerm_app_service_plan" "fn" {
   name                = "${var.prefix}fn"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   location            = "${azurerm_resource_group.rg.location}"
-  kind                = "Linux" // I think this needs to be functionapp,linux but Terraform doesn't like that
+  kind                = "functionapp,linux" // TODO Terraform doesn't like this
   sku {
     tier = "Dynamic"
     size = "Y1"
