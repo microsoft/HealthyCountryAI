@@ -95,7 +95,7 @@ resource "azurerm_function_app" "fn" {
   app_service_plan_id       = "${azurerm_app_service_plan.fn.id}"
   storage_connection_string = "${azurerm_storage_account.fnsa.primary_connection_string}"
   app_settings {
-    "APPINSIGHTS_INSTRUMENTATIONKEY" = "${azurerm_application_insights.ai.id}"
+    "APPINSIGHTS_INSTRUMENTATIONKEY" = "${azurerm_application_insights.ai.instrumentation_key}"
     "FUNCTIONS_EXTENSION_VERSION" = "~2"
     "FUNCTIONS_WORKER_RUNTIME" = "python"
   }
