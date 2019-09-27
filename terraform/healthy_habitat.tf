@@ -80,7 +80,7 @@ resource "azurerm_app_service_plan" "fn" {
   name                = "${var.prefix}fn"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   location            = "${azurerm_resource_group.rg.location}"
-  kind                = "functionapp,linux"
+  kind                = "Linux" // I think this needs to be functionapp,linux but Terraform doesn't like that
   sku {
     tier = "Dynamic"
     size = "Y1"
