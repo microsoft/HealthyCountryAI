@@ -76,14 +76,18 @@ resource "azurerm_storage_account" "fnsa" {
 }
 
 # create app service plan for functions
-resource "azurerm_app_service_plan" "fn" {
-  name                = "${var.prefix}fn"
+# (the native Terraform provider for ARM doesn't support the `functionapp,linux` kind)
+resource "azurerm_template_deployment" "fn-asp" {
+  name                = "${var.prefix}-fn-asp"
   resource_group_name = "${azurerm_resource_group.rg.name}"
-  location            = "${azurerm_resource_group.rg.location}"
-  kind                = "functionapp,linux" // TODO Terraform doesn't like this
-  sku {
-    tier = "Dynamic"
-    size = "Y1"
+  deployment_mode     = "Incremental"
+  template_body       = "${file("../arm/azuredeploy_fn-asp.json")}"
+  parameters = {
+    planName = "${var.prefix}-fn-asp"
+    location = var.location
+    kind     = "functionapp,linux"
+    skuTier  = "Dynamic"
+    skuSize  = "Y1"
   }
 }
 
@@ -92,7 +96,7 @@ resource "azurerm_function_app" "fn" {
   name                      = "${var.prefix}fn"
   resource_group_name       = "${azurerm_resource_group.rg.name}"
   location                  = "${azurerm_resource_group.rg.location}"
-  app_service_plan_id       = "${azurerm_app_service_plan.fn.id}"
+  app_service_plan_id       = "${azurerm_template_deployment.fn-asp.outputs["planResourceId"]}"
   storage_connection_string = "${azurerm_storage_account.fnsa.primary_connection_string}"
 
   app_settings = {
