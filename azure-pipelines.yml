@@ -1,0 +1,20 @@
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: Terraform@2
+  inputs:
+    TemplatePath: 'healthy_habitat.tf'
+    Arguments: 
+    InstallTerraform: true
+    UseAzureSub: true
+    ConnectedServiceNameSelector: 'ConnectedServiceNameARM'
+    ConnectedServiceNameARM: 'Azure CXP FTA Internal Subscription CBELLEE (b2375b5f-8dab-4436-b87c-32bc7fdce5d0)'
+    ManageState: true
+    SpecifyStorageAccount: true
+    StorageAccountResourceGroup: 'tstate'
+    StorageAccountRM: 'tstate28432'
+    StorageContainerName: 'tstate'
