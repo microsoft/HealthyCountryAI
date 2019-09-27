@@ -8,7 +8,7 @@ terraform {
 
 # configure the provider
 provider "azurerm" {
-  //version = "1.35.0"
+  version = "~> 1.34"
 
   //use_msi = true
 }
@@ -126,7 +126,7 @@ resource "azurerm_template_deployment" "aml" {
   name                = "${var.prefix}-aml"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   deployment_mode     = "Incremental"
-  template_body       = "${file("arm/azuredeploy_aml.json")}"
+  template_body       = "${file("../arm/azuredeploy_aml.json")}"
   parameters = {
     workspaceName         = "${var.prefix}-aml"
     location              = var.location
@@ -142,7 +142,7 @@ resource "azurerm_template_deployment" "vis-geese" {
   name                = "${var.prefix}-vis-geese"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   deployment_mode     = "Incremental"
-  template_body       = "${file("arm/azuredeploy_vis.json")}"
+  template_body       = "${file("../arm/azuredeploy_vis.json")}"
   parameters = {
     accountName = "${var.prefix}-vis-geese"
     location    = var.location
@@ -155,7 +155,7 @@ resource "azurerm_template_deployment" "vis-grass" {
   name                = "${var.prefix}-vis-grass"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   deployment_mode     = "Incremental"
-  template_body       = "${file("arm/azuredeploy_vis.json")}"
+  template_body       = "${file("../arm/azuredeploy_vis.json")}"
   parameters = {
     accountName = "${var.prefix}-vis-grass"
     location    = var.location
