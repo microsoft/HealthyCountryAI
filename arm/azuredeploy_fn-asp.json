@@ -1,0 +1,51 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "planName": {
+            "type": "string"
+        },
+        "skuTier": {
+            "type": "string",
+            "defaultValue": "Dynamic",
+            "allowedValues": [
+                "Dynamic",
+                "Basic",
+                "Standard",
+                "Premium"
+            ]
+        },
+        "skuSize": {
+            "type": "string",
+            "defaultValue": "Y1"
+        },
+        "kind": {
+            "type": "string",
+            "defaultValue": "functionapp,linux"
+        },
+        "location": {
+            "type": "string",
+            "minLength": 1,
+            "defaultValue": "australiaeast"
+        }
+    },
+    "resources": [
+        {
+            "name": "[parameters('planName')]",
+            "type": "Microsoft.Web/serverFarms",
+            "apiVersion": "2018-02-01",
+            "location": "[parameters('location')]",
+            "kind": "[parameters('kind')]",
+            "sku": {
+                "tier": "[parameters('skuTier')]",
+                "name": "[parameters('skuSize')]"
+            }
+        }
+    ],
+    "outputs": {
+        "planResourceId": {
+            "type": "string",
+            "value": "[resourceId('Microsoft.Web/serverFarms', parameters('planName'))]"
+        }
+    }
+}
