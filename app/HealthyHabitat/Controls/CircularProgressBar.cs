@@ -32,14 +32,26 @@
         }
         void CircularProgressBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-
             CircularProgressBar bar = sender as CircularProgressBar;
             double currentAngle = bar.Angle;
             double targetAngle = e.NewValue / bar.Maximum * 359.999;
             double duration = Math.Abs(currentAngle - targetAngle) / 359.999 * 500;
             DoubleAnimation anim = new DoubleAnimation(currentAngle, targetAngle, TimeSpan.FromMilliseconds(duration > 0 ? duration : 10));
+
             bar.BeginAnimation(CircularProgressBar.AngleProperty, anim, HandoffBehavior.Compose);
+
+            this.Percentage = bar.Angle / 359.999;
         }
+
+        public double Percentage
+        {
+            get { return (double)GetValue(PercentageProperty); }
+            set { SetValue(PercentageProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Percentage.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty PercentageProperty =
+            DependencyProperty.Register("Percentage", typeof(double), typeof(CircularProgressBar), new PropertyMetadata(0.0));
 
         public double Angle
         {

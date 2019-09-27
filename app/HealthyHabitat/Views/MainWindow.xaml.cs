@@ -26,7 +26,6 @@
         public MainWindow()
         {
             InitializeComponent();
-            //this.DataContext = new MainWindowViewModel();
         }
 
         private void Grid_MouseDown(object sender, MouseButtonEventArgs e)

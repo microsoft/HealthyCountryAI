@@ -3,12 +3,15 @@
     using GalaSoft.MvvmLight;
     using GalaSoft.MvvmLight.Command;
     using MvvmDialogs;
+    using SixSeasons.Helpers;
     using SixSeasons.Models;
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
     using System.ComponentModel;
     using System.Configuration;
+    using System.IO;
     using System.Linq;
     using System.Windows;
     using System.Windows.Input;
@@ -77,9 +80,21 @@
             set { _selectedLocation = value; }
         }
 
-        private readonly BackgroundWorker worker;
-        private int _progressValue;
-        public int ProgressValue
+        //        private readonly BackgroundWorker worker;
+
+        private double _progressValueMax;
+        public double ProgressValueMax
+        {
+            get { return _progressValueMax; }
+            set
+            {
+                _progressValueMax = value;
+                RaisePropertyChanged("ProgressValueMax");
+            }
+        }
+
+        private double _progressValue;
+        public double ProgressValue
         {
             get { return _progressValue; }
             set
@@ -128,35 +143,15 @@
                 Locations.Add(new Location() { Id = loc, Name = locationSection[loc] });
             }
 
-            //Locations = new ObservableCollection<Location>()
-            //{
-            //    new Location(){ Id="cannon-hill", Name="Cannon Hill" },
-            //    new Location(){ Id="jabire-dreaming", Name="Jabire Dreaming" },
-            //    new Location(){ Id="ubir", Name="Ubir" }
-            //};
-
             this.dialogService = dialogService;
-
-            //ShowMessageBoxWithMessageCommand = new RelayCommand(ShowMessageBoxWithMessage);
-
-            this.worker = new BackgroundWorker();
-            this.worker.WorkerReportsProgress = true;
-            //this.worker.DoWork += this.DoWork;
-            this.worker.ProgressChanged += this.ProgressChanged;
-
-            CopyCommand = new RelayCommand(() =>
-            {
-                this.worker.RunWorkerAsync();
-            }, () =>
-            {
-                return !this.worker.IsBusy;
-            });
 
             UploadClickCommand = new RelayCommand(() =>
             {
                 LocationDialogVisible = false;
 
-                OpenCopyDialog();
+                ProgressVisible = true;
+
+                CopyFilesToLocalCache(this.Files.ToArray<string>(), this.SelectedLocation.Id, this.SelectedSeason);
             });
 
             ExitCommand = new RelayCommand(() =>
@@ -166,121 +161,45 @@
 
             DropCommand = new RelayCommand<DragEventArgs>(e =>
             {
-                //var element = e.OriginalSource as UIElement;
-                //element.Opacity = 0;
                 SelectedSeason = ((System.Windows.Shapes.Path)e.Source).Tag.ToString();//Not safe
-
-                // Make Propmt for location
 
                 if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 {
                     Files = new ObservableCollection<string>((string[])e.Data.GetData(DataFormats.FileDrop));
                 }
 
-                OpenLocationDialog();
+                LocationDialogVisible = true;
             });
         }
 
-        private void OpenLocationDialog()
-        {
-            LocationDialogVisible = true;
-        }
-
-        private void OpenCopyDialog()
-        {
-            ProgressVisible = true;
-
-            CopyFilesToLocalCache(this.Files.ToArray<string>(), this.SelectedLocation.Id, this.SelectedSeason);
-        }
-
-        private void CopyFilesToLocalCache(string[] files, string location, string season)
+        private async void CopyFilesToLocalCache(string[] files, string location, string season)
         {
             string cacheLocation = System.Configuration.ConfigurationManager.AppSettings["localCache"].ToString() ?? AppDomain.CurrentDomain.BaseDirectory;
 
-            foreach (string file in files)
+            Dictionary<string, string> fileCopyManifest = new Dictionary<string, string>();
+
+            double size = 0;
+
+            foreach (string filename in files)
             {
-                DateTime lastModifiedDate = System.IO.File.GetLastWriteTime(file);
+                DateTime lastModifiedDate = System.IO.File.GetLastWriteTime(filename);
 
                 string destination = System.IO.Path.Combine(cacheLocation, string.Format("{0}-{1}", location, season), lastModifiedDate.ToString("yyyy'-'MM'-'dd'-'HH''mm"));
 
                 System.IO.Directory.CreateDirectory(destination);
 
-                string destinationFile = System.IO.Path.Combine(destination, System.IO.Path.GetFileName(file));
+                string destinationFile = System.IO.Path.Combine(destination, System.IO.Path.GetFileName(filename));
 
-                System.IO.File.Copy(file, destinationFile, true);
+                fileCopyManifest.Add(filename, destinationFile);
+                FileInfo file = new FileInfo(filename);
+                size += file.Length;
             }
-        }
 
-        private void InitiateAzCopy()
-        {
+            ProgressValueMax = size;
 
-        }
+            await AsyncFileCopy.CopyFiles(fileCopyManifest, prog => ProgressValue = prog);
 
-        //private void DoWork(object sender, DoWorkEventArgs e)
-        //{
-        //    for (int i = 0; i <= 100; i++)
-        //    {
-        //        Thread.Sleep(10);//Do your Work Here instead of sleeping
-        //        worker.ReportProgress(i);
-        //    }
-        //}
-
-        private void ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            this.ProgressValue = e.ProgressPercentage;
+            ProgressVisible = false;
         }
     }
-
-    //public class CustomFileCopier
-    //{
-    //    public CustomFileCopier(string Source, string Dest)
-    //    {
-    //        this.SourceFilePath = Source;
-    //        this.DestFilePath = Dest;
-
-    //        OnProgressChanged += delegate { };
-    //        OnComplete += delegate { };
-    //    }
-
-    //    public void Copy()
-    //    {
-    //        byte[] buffer = new byte[1024 * 1024]; // 1MB buffer
-    //        bool cancelFlag = false;
-
-    //        using (FileStream source = new FileStream(SourceFilePath, FileMode.Open, FileAccess.Read))
-    //        {
-    //            long fileLength = source.Length;
-    //            using (FileStream dest = new FileStream(DestFilePath, FileMode.CreateNew, FileAccess.Write))
-    //            {
-    //                long totalBytes = 0;
-    //                int currentBlockSize = 0;
-
-    //                while ((currentBlockSize = source.Read(buffer, 0, buffer.Length)) > 0)
-    //                {
-    //                    totalBytes += currentBlockSize;
-    //                    double persentage = (double)totalBytes * 100.0 / fileLength;
-
-    //                    dest.Write(buffer, 0, currentBlockSize);
-
-    //                    cancelFlag = false;
-    //                    OnProgressChanged(persentage, ref cancelFlag);
-
-    //                    if (cancelFlag == true)
-    //                    {
-    //                        // Delete dest file here
-    //                        break;
-    //                    }
-    //                }
-    //            }
-    //        }
-
-    //        OnComplete();
-    //    }
-
-    //    public string SourceFilePath { get; set; }
-    //    public string DestFilePath { get; set; }
-
-    //    //public event ProgressChangeDelegate OnProgressChanged;
-    //    //public event Completedelegate OnComplete;
-    //}
 }

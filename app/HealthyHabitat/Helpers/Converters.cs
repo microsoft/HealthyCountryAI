@@ -7,6 +7,21 @@
     using System.Windows.Data;
     using System.Windows.Media;
 
+    public class AngleToPercentageConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            double angle = (double)value;
+
+            return (angle / 359.999) * 100;
+        }
+        public object ConvertBack(object value, Type targetTypes, object parameter, System.Globalization.CultureInfo culture)
+        {
+            double percentage = (double)value;
+
+            return percentage * 359.999;
+        }
+    }
     public class AngleToPointConverter : IMultiValueConverter
     {
 
@@ -126,7 +141,6 @@
             throw new NotImplementedException();
         }
     }
-
     public class StrokeLineCapConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
@@ -144,7 +158,6 @@
             throw new NotImplementedException();
         }
     }
-
     public class VisibilityConverter : IValueConverter
     {
         public object Convert(object value, System.Type targetType, object parameter, System.Globalization.CultureInfo culture)

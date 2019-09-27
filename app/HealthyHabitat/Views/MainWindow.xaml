@@ -15,6 +15,7 @@
         ResizeMode="NoResize">
     <Window.Resources>
         <valueconverters:VisibilityConverter x:Key="VisibilityConverter" />
+        <valueconverters:AngleToPercentageConverter x:Key="AngleToPercentageConverter" />
     </Window.Resources>
     <Grid MouseDown="Grid_MouseDown">
         <Image x:Name="image" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Source="../Images/Ngurrungurrudjba-Yellow-Water-Seasons.png" />
@@ -139,8 +140,8 @@
         <Grid Visibility="{Binding Path=ProgressVisible, Converter={StaticResource VisibilityConverter}}">
             <controls:CircularProgressBar
             x:Name="cpb"
-            Thickness="40" 
-            Radius="400"
+            Thickness="50" 
+            Radius="370"
             Value="{Binding Path=ProgressValue}"
             Style="{StaticResource CircularProgressBarStyle}"
             Background="#FF9A4133"
@@ -149,14 +150,16 @@
             StrokeThickness="40"
             StrokeMode="Inside"
             EndLineCap="Flat" Margin="10,-23,-10,23" />
-            <TextBlock Text="{Binding Path=Angle, ElementName=cpb, StringFormat={}{0:0}°}"
-                   FontSize="22"
+            <TextBlock Text="{Binding Path=Angle, ElementName=cpb, Converter={StaticResource AngleToPercentageConverter}, StringFormat={}Copying {0:0}%, FallbackValue=0}"
+                   FontSize="65"
                    FontWeight="Bold"
+                   Width="500"
+                   Height="100"
+                   TextAlignment="Center"
                    HorizontalAlignment="Center" VerticalAlignment="Center"
-                   Background="Transparent"
-                   Foreground="#FF9A4133" Margin="402,358,376,412" />
+                   Foreground="#FF9A4133"></TextBlock>
         </Grid>
-        <Grid Name="gridLocationDialog" Visibility="{Binding Path=LocationDialogVisible, Converter={StaticResource VisibilityConverter}}">
+        <Grid Name="gridLocationDialog" Visibility="{Binding Path=LocationDialogVisible, Converter={StaticResource VisibilityConverter}, FallbackValue=Collapsed}">
             <Ellipse Fill="White" Stroke="#FF9A4133" StrokeThickness="30" />
             <TextBlock Text="Please select the location" 
                    HorizontalAlignment="Center" VerticalAlignment="Center"
