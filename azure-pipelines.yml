@@ -6,15 +6,35 @@ pool:
 
 steps:
 - task: Terraform@2
+  displayName: Run Terraform Template
   inputs:
-    TemplatePath: 'healthy_habitat.tf'
+    TemplatePath: 'terraform/healthy_habitat.tf'
     Arguments: 
     InstallTerraform: true
     UseAzureSub: true
     ConnectedServiceNameSelector: 'ConnectedServiceNameARM'
-    ConnectedServiceNameARM: 'Azure CXP FTA Internal Subscription CBELLEE (b2375b5f-8dab-4436-b87c-32bc7fdce5d0)'
+    ConnectedServiceNameARM: 'jodowns VS' # TODO can this be parameterised?
     ManageState: true
     SpecifyStorageAccount: true
-    StorageAccountResourceGroup: 'tstate'
-    StorageAccountRM: 'tstate28432'
-    StorageContainerName: 'tstate'
+    StorageAccountResourceGroup: 'Deployment' # TODO can this be parameterised?
+    StorageAccountRM: 'jodownscsirodeploy' # TODO can this be parameterised?
+    StorageContainerName: 'terraform' # TODO can this be parameterised?
+
+# TODO can we pass an output variable through to the function app deployment?
+
+- script: |
+   wget -q https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb
+   sudo dpkg -i packages-microsoft-prod.deb
+   sudo apt-get update
+   sudo apt-get install azure-functions-core-tools
+  displayName: Install Azure Functions CLI
+
+- task: AzureCLI@1
+  displayName: Deploy Function App
+  inputs:
+    azureSubscription: 'jodowns VS'
+    scriptLocation: inlineScript
+    inlineScript: |
+     cd functions/TestFunction
+     func azure functionapp publish jdfuncpy --python --build-native-deps
+    workingDirectory: '$(System.DefaultWorkingDirectory)/github'
