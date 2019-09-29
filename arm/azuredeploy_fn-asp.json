@@ -45,7 +45,7 @@
     "outputs": {
         "planResourceId": {
             "type": "string",
-            "value": "[resourceId('Microsoft.Web/serverFarms', parameters('planName'))]"
+            "value": "[resourceId('Microsoft.Web/serverfarms', parameters('planName'))]"
         }
     }
 }
