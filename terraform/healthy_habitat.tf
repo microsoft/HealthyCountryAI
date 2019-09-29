@@ -1,16 +1,10 @@
 terraform {
-  backend "azurerm" {
-    //container_name       = "tstate"
-    //storage_account_name = "tstate28432"
-    //key                  = "terraform.tfstate"
-  }
+  backend "azurerm" { }
 }
 
 # configure the provider
 provider "azurerm" {
   version = "~> 1.34" // was 1.35.0 but this caused an error on Azure Pipelines
-
-  //use_msi = true
 }
 
 # create resource group
@@ -126,6 +120,7 @@ resource "azurerm_container_registry" "acr" {
 }
 
 # create a machine learning workspace
+/* TODO Temporarily disabled due to race condition
 resource "azurerm_template_deployment" "aml" {
   name                = "${var.prefix}-aml"
   resource_group_name = "${azurerm_resource_group.rg.name}"
@@ -140,6 +135,7 @@ resource "azurerm_template_deployment" "aml" {
     containerRegistryId   = "${azurerm_container_registry.acr.id}"
   }
 }
+*/
 
 # create cognitive services computer vision project for magpie geese
 resource "azurerm_template_deployment" "vis-geese" {
@@ -172,15 +168,19 @@ output "app_insights_key" {
   value = "${azurerm_application_insights.ai.instrumentation_key}"
 }
 
-output "app_id" {
+output "app_insights_app_id" {
   value = "${azurerm_application_insights.ai.app_id}"
 }
 
-output "workspace_id" {
+output "function_app_name" {
+  value = "${azurerm_function_app.fn.name}"
+}
+
+/* output "workspace_id" {
   value = "${azurerm_template_deployment.aml.outputs["workspaceId"]}"
 }
 
-/* output "cognitive_vision_geese_key" {
+output "cognitive_vision_geese_key" {
   depends_on = [azurerm_template_deployment.vis-geese, ]
   value      = "${lookup(azurerm_template_deployment.vis-geese.outputs, "cognitiveServicesKey")}"
 }
