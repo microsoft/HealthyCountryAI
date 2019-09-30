@@ -78,7 +78,7 @@ resource "azurerm_template_deployment" "fn" {
   template_body       = "${file("../arm/azuredeploy_fn.json")}"
   parameters = {
     planName                       = "${var.prefix}fn-asp"
-    appName                        = "${var.prefix}fn"
+    functionAppName                = "${var.prefix}fn"
     location                       = var.location
     appInsightsInstrumentationKey  = "${azurerm_application_insights.ai.instrumentation_key}"
     storageAccountConnectionString = "${azurerm_storage_account.fnsa.primary_connection_string}"

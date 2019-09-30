@@ -8,10 +8,6 @@
         "functionAppName": {
             "type": "string"
         },
-        "kind": {
-            "type": "string",
-            "defaultValue": "functionapp,linux"
-        },
         "location": {
             "type": "string",
             "minLength": 1,
