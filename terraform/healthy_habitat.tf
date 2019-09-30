@@ -53,6 +53,7 @@ resource "azurerm_key_vault" "kv" {
       # Ignore changes to access policy because Azure ML has an issue with redeploying Key Vault (https://docs.microsoft.com/bs-latn-ba/azure/machine-learning/service/how-to-create-workspace-template#azure-key-vault-access-policy-and-azure-resource-manager-templates)
       access_policy
     ]
+  }
 }
 
 # create Storage Account for data
