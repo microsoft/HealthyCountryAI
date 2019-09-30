@@ -40,7 +40,6 @@ steps:
     backendAzureRmContainerName: $(terraformStateStorageContainerName)
     backendAzureRmKey: $(terraformStateStorageBlobName)
 
-steps:
 - powershell: |
    $jsonPath=(Get-ChildItem env:TERRAFORMTASK*_JSONOUTPUTVARIABLESPATH).Value
    Write-Host "Converting Terraform output from $jsonPath to Azure Pipelines variables."
