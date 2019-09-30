@@ -173,20 +173,4 @@ output "cognitive_vision_grass_endpoint" {
   depends_on = [azurerm_template_deployment.vis-grass, ]
   value      = "${lookup(azurerm_template_deployment.vis-grass.outputs, "cognitiveServicesKey")}"
 }
-
-resource "azurerm_machine_learning_workspace" "aml" {
-  name                 = "${var.prefix}-aml"
-  location             = var.location
-  resource_group_name  = "${azurerm_resource_group.rg.name}"
-  description          = "test aml workspace"
-  friendly_name        = "test aml workspace"
-  key_vault            = "${azurerm_key_vault.kv.id}"
-  storage_account      = "${azurerm_storage_account.sa.id}"
-  application_insights = "${azurerm_application_insights.ai.id}"
-  container_registry   = "${azurerm_container_registry.acr.id}"
-  discovery_url        = "http://test.com"
-  tags = {
-    environment = var.environment
-  }
-}
 */

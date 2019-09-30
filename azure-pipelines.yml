@@ -10,6 +10,7 @@ variables:
   terraformStateStorageAccountName: jodownscsirodeploy
   terraformStateStorageContainerName: terraform
   terraformStateStorageBlobName: terraform.tfstate
+  functionAppFolder: functions/TestFunction
 
 steps:
 - task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-installer.TerraformInstaller@0
@@ -63,6 +64,6 @@ steps:
     azureSubscription: $(azureSubscriptionServiceConnectionName)
     scriptLocation: inlineScript
     inlineScript: |
-     cd functions/TestFunction
-     func azure functionapp publish jdfuncpy --python --build-native-deps
+     cd $functionAppFolder
+     func azure functionapp publish $function_app_name --python --build-native-deps
     workingDirectory: '$(System.DefaultWorkingDirectory)/github'
