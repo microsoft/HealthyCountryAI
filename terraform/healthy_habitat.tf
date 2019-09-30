@@ -97,6 +97,7 @@ resource "azurerm_function_app" "fn" {
     "APPINSIGHTS_INSTRUMENTATIONKEY" = "${azurerm_application_insights.ai.instrumentation_key}"
     "FUNCTIONS_EXTENSION_VERSION" = "~2"
     "FUNCTIONS_WORKER_RUNTIME" = "python"
+    "TODO_JOHN" = "Hello"
   }
 }
 
@@ -164,6 +165,11 @@ resource "azurerm_template_deployment" "vis-grass" {
 }
 
 # outputs
+output "function_app_name" {
+  value = "${azurerm_function_app.fn.name}"
+}
+
+/*
 output "app_insights_key" {
   value = "${azurerm_application_insights.ai.instrumentation_key}"
 }
@@ -172,11 +178,7 @@ output "app_insights_app_id" {
   value = "${azurerm_application_insights.ai.app_id}"
 }
 
-output "function_app_name" {
-  value = "${azurerm_function_app.fn.name}"
-}
-
-/* output "workspace_id" {
+output "workspace_id" {
   value = "${azurerm_template_deployment.aml.outputs["workspaceId"]}"
 }
 
@@ -198,9 +200,9 @@ output "cognitive_vision_grass_key" {
 output "cognitive_vision_grass_endpoint" {
   depends_on = [azurerm_template_deployment.vis-grass, ]
   value      = "${lookup(azurerm_template_deployment.vis-grass.outputs, "cognitiveServicesKey")}"
-} */
+}
 
-/* resource "azurerm_machine_learning_workspace" "aml" {
+resource "azurerm_machine_learning_workspace" "aml" {
   name                 = "${var.prefix}-aml"
   location             = var.location
   resource_group_name  = "${azurerm_resource_group.rg.name}"
@@ -214,4 +216,5 @@ output "cognitive_vision_grass_endpoint" {
   tags = {
     environment = var.environment
   }
-} */
+}
+*/
