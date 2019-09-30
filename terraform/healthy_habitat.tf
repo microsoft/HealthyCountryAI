@@ -69,35 +69,19 @@ resource "azurerm_storage_account" "fnsa" {
   tags                     = var.tags
 }
 
-# create app service plan for functions
+# create app service and plan for functions
 # (the native Terraform provider for ARM doesn't support the `functionapp,linux` kind)
-resource "azurerm_template_deployment" "fn-asp" {
-  name                = "${var.prefix}-fn-asp"
+resource "azurerm_template_deployment" "fn" {
+  name                = "${var.prefix}-fn"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   deployment_mode     = "Incremental"
-  template_body       = "${file("../arm/azuredeploy_fn-asp.json")}"
+  template_body       = "${file("../arm/azuredeploy_fn.json")}"
   parameters = {
-    planName = "${var.prefix}-fn-asp"
-    location = var.location
-    kind     = "functionapp,linux"
-    skuTier  = "Dynamic"
-    skuSize  = "Y1"
-  }
-}
-
-# create app service for functions
-resource "azurerm_function_app" "fn" {
-  name                      = "${var.prefix}fn"
-  resource_group_name       = "${azurerm_resource_group.rg.name}"
-  location                  = "${azurerm_resource_group.rg.location}"
-  app_service_plan_id       = "${azurerm_template_deployment.fn-asp.outputs["planResourceId"]}"
-  kind                      = "functionapp,linux"
-  storage_connection_string = "${azurerm_storage_account.fnsa.primary_connection_string}"
-
-  app_settings = {
-    "APPINSIGHTS_INSTRUMENTATIONKEY" = "${azurerm_application_insights.ai.instrumentation_key}"
-    "FUNCTIONS_EXTENSION_VERSION" = "~2"
-    "FUNCTIONS_WORKER_RUNTIME" = "python"
+    planName                       = "${var.prefix}fn-asp"
+    appName                        = "${var.prefix}fn"
+    location                       = var.location
+    appInsightsInstrumentationKey  = "${azurerm_application_insights.ai.instrumentation_key}"
+    storageAccountConnectionString = "${azurerm_storage_account.fnsa.primary_connection_string}"
   }
 }
 
@@ -166,7 +150,7 @@ resource "azurerm_template_deployment" "vis-grass" {
 
 # outputs
 output "function_app_name" {
-  value = "${azurerm_function_app.fn.name}"
+  value = "${var.prefix}fn"
 }
 
 /*
