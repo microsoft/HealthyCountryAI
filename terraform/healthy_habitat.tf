@@ -72,6 +72,10 @@ resource "azurerm_template_deployment" "fn" {
     location                       = var.location
     appInsightsInstrumentationKey  = "${azurerm_application_insights.ai.instrumentation_key}"
     storageAccountConnectionString = "${azurerm_storage_account.fnsa.primary_connection_string}"
+    dataBlobAccountName            = "${azurerm_storage_account.fnsa.name}"
+    dataBlobAccountKey             = "${azurerm_storage_account.fnsa.primary_access_key}"
+    customVisionEndpoint           = "${lookup(azurerm_template_deployment.vis-geese.outputs, "cognitiveServicesKey")}" # TODO assuming using the geese one
+    customVisionTrainingKey        = "${lookup(azurerm_template_deployment.vis-geese.outputs, "cognitiveServicesEndpoint")}" # TODO assuming using the geese one
   }
 }
 

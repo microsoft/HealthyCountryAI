@@ -3,23 +3,61 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "planName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description": "The name to use when deploying the app service plan."
+            }
         },
         "functionAppName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description": "The name to use when deploying the function app. This name must be globally unique."
+            }
         },
         "location": {
             "type": "string",
             "minLength": 1,
-            "defaultValue": "australiaeast"
+            "defaultValue": "australiaeast",
+            "metadata": {
+                "description": "The location in which to deploy the resources."
+            }
         },
         "appInsightsInstrumentationKey": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description": "The instrumentation key to use when sending telemetry to Application Insights."
+            }
         },
         "storageAccountConnectionString": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description": "The connection string to the storage account that contains the Azure Functions runtime data."
+            }
+        },
+        "dataBlobAccountName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the storage account that contains the incoming image files."
+            }
+        },
+        "dataBlobAccountKey": {
+            "type": "string",
+            "metadata": {
+                "description": "The key for the storage account that contains the incoming image files."
+            }
+        },
+        "customVisionEndpoint": {
+            "type": "string",
+            "metadata": {
+                "description": "The endpoint for the Custom Vision service that should process the tiled images for training purposes."
+            }
+        },
+        "customVisionTrainingKey": {
+            "type": "string",
+            "metadata": {
+                "description": "The key for the Custom Vision service that should process the tiled images for training purposes."
+            }
         }
-
     },
     "resources": [
         {
@@ -65,6 +103,22 @@
                         {
                             "name": "FUNCTIONS_EXTENSION_VERSION",
                             "value": "~2"
+                        },
+                        {
+                            "name": "BLOB_ACCOUNT_NAME",
+                            "value": "[parameters('blobAccountName')]"
+                        },
+                        {
+                            "name": "BLOB_ACCOUNT_KEY",
+                            "value": "[parameters('blobAccountKey')]"
+                        },
+                        {
+                            "name": "CUSTOM_VISION_ENDPOINT",
+                            "value": "[parameters('customVisionEndpoint')]"
+                        },
+                        {
+                            "name": "CUSTOM_VISION_TRAINING_KEY",
+                            "value": "[parameters('customVisionTrainingKey')]"
                         }
                     ]
                 },
