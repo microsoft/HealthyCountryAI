@@ -15,7 +15,6 @@ variables:
 steps:
 
 - checkout: self
-  path: $(System.DefaultWorkingDirectory)
 
 - task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-installer.TerraformInstaller@0
   displayName: 'Install Terraform 0.12.9'
