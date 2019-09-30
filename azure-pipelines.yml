@@ -1,26 +1,54 @@
-#trigger:
-#- master
+trigger:
+- master
 
 pool:
   vmImage: 'ubuntu-latest'
 
-steps:
-- task: Terraform@2
-  displayName: Run Terraform Template
-  inputs:
-    TemplatePath: 'terraform/healthy_habitat.tf'
-    Arguments: 
-    InstallTerraform: true
-    UseAzureSub: true
-    ConnectedServiceNameSelector: 'ConnectedServiceNameARM'
-    ConnectedServiceNameARM: 'jodowns VS' # TODO can this be parameterised?
-    ManageState: true
-    SpecifyStorageAccount: true
-    StorageAccountResourceGroup: 'Deployment' # TODO can this be parameterised?
-    StorageAccountRM: 'jodownscsirodeploy' # TODO can this be parameterised?
-    StorageContainerName: 'terraform' # TODO can this be parameterised?
+variables:
+  azureSubscriptionServiceConnectionName: jodowns VS
+  terraformStateResourceGroupName: Deployment
+  terraformStateStorageAccountName: jodownscsirodeploy
+  terraformStateStorageContainerName: terraform
+  terraformStateStorageBlobName: terraform.tfstate
 
-# TODO can we pass an output variable through to the function app deployment?
+steps:
+- task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-installer.TerraformInstaller@0
+  displayName: 'Install Terraform 0.12.9'
+  inputs:
+    terraformVersion: 0.12.9
+
+- task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV1@0
+  displayName: 'terraform init'
+  inputs:
+    workingDirectory: '$(System.DefaultWorkingDirectory)/github/terraform'
+    backendServiceArm: $(azureSubscriptionServiceConnectionName)
+    backendAzureRmResourceGroupName: $(terraformStateResourceGroupName)
+    backendAzureRmStorageAccountName: $(terraformStateStorageAccountName)
+    backendAzureRmContainerName: $(terraformStateStorageContainerName)
+    backendAzureRmKey: $(terraformStateStorageBlobName)
+
+- task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV1@0
+  displayName: 'terraform apply'
+  inputs:
+    command: apply
+    workingDirectory: '$(System.DefaultWorkingDirectory)/github/terraform'
+    environmentServiceNameAzureRM: $(azureSubscriptionServiceConnectionName)
+    backendServiceArm: $(azureSubscriptionServiceConnectionName)
+    backendAzureRmResourceGroupName: $(terraformStateResourceGroupName)
+    backendAzureRmStorageAccountName: $(terraformStateStorageAccountName)
+    backendAzureRmContainerName: $(terraformStateStorageContainerName)
+    backendAzureRmKey: $(terraformStateStorageBlobName)
+
+steps:
+- powershell: |
+   $jsonPath=(Get-ChildItem env:TERRAFORMTASK*_JSONOUTPUTVARIABLESPATH).Value
+   Write-Host "Converting Terraform output from $jsonPath to Azure Pipelines variables."
+   $json=Get-Content $jsonPath | ConvertFrom-Json
+   $json | Get-Member -type NoteProperty | ForEach-Object {
+        $o=$json."$($_.Name)"
+        "##vso[task.setvariable variable=$($_.Name)$(if ($o.sensitive -eq "True") {";issecret=true"})]$($o.value)"
+    }
+  displayName: 'Create Azure Pipelines Variables'
 
 - script: |
    wget -q https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb
@@ -32,7 +60,7 @@ steps:
 - task: AzureCLI@1
   displayName: Deploy Function App
   inputs:
-    azureSubscription: 'jodowns VS'
+    azureSubscription: $(azureSubscriptionServiceConnectionName)
     scriptLocation: inlineScript
     inlineScript: |
      cd functions/TestFunction
