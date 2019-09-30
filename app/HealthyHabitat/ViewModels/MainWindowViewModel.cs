@@ -179,7 +179,8 @@
 
         private async void CopyFilesToLocalCache(string[] files, string location, string season)
         {
-            string cacheLocation = ConfigurationManager.AppSettings["localCache"].ToString() ?? AppDomain.CurrentDomain.BaseDirectory;
+
+            string cacheLocation = System.IO.Path.Combine(ConfigurationManager.AppSettings["localCache"].ToString() ?? AppDomain.CurrentDomain.BaseDirectory, Guid.NewGuid().ToString());
 
             Dictionary<string, string> fileCopyManifest = new Dictionary<string, string>();
 
@@ -225,14 +226,19 @@
 
             ProgressVisible = false;
 
-            InitiateAzCopy();
+            string[] subFolders = Directory.GetDirectories(cacheLocation);
+
+            foreach (string folder in subFolders)
+            {
+                InitiateAzCopy(folder);
+            }
+            
         }
 
-        private async Task InitiateAzCopy()
+        private async Task InitiateAzCopy(string sourceDir)
         {
             StringBuilder command = new StringBuilder("/C azcopy cp \"[sourceDir]\" \"[sasUri]\" --recursive=true --put-md5");
 
-            string sourceDir = ConfigurationManager.AppSettings["localCache"] ?? AppDomain.CurrentDomain.BaseDirectory;
             string account = ConfigurationManager.AppSettings["storageAccountName"];
             string containerName = ConfigurationManager.AppSettings["containerName"];
             string key = ConfigurationManager.AppSettings["key"];
@@ -290,7 +296,7 @@
                 {
                     // When the start time for the SAS is omitted, the start time is assumed to be the time when the storage service receives the request.
                     // Omitting the start time for a SAS that is effective immediately helps to avoid clock skew.
-                    SharedAccessStartTime = DateTime.UtcNow.AddHours(-24),
+                    SharedAccessStartTime = DateTime.UtcNow,
                     SharedAccessExpiryTime = DateTime.UtcNow.AddHours(24),
                     Permissions = SharedAccessBlobPermissions.Write //| SharedAccessBlobPermissions.List
                 };
