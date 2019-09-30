@@ -1,0 +1,8 @@
+{
+    "python.pythonPath": "c:\\Users\\krbock\\AppData\\Local\\Continuum\\miniconda3\\envs\\HealthyHabitatAI\\python.exe",
+    "azureFunctions.deploySubpath": "src/src.zip",
+    "azureFunctions.projectLanguage": "Python",
+    "azureFunctions.projectRuntime": "~2",
+    "debug.internalConsoleOptions": "neverOpen",
+    "azureFunctions.preDeployTask": "func: pack"
+}
