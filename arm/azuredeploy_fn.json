@@ -1,0 +1,79 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "planName": {
+            "type": "string"
+        },
+        "functionAppName": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string",
+            "minLength": 1,
+            "defaultValue": "australiaeast"
+        },
+        "appInsightsInstrumentationKey": {
+            "type": "string"
+        },
+        "storageAccountConnectionString": {
+            "type": "string"
+        }
+
+    },
+    "resources": [
+        {
+            "name": "[parameters('planName')]",
+            "type": "Microsoft.Web/serverFarms",
+            "apiVersion": "2018-02-01",
+            "location": "[parameters('location')]",
+            "kind": "functionapp",
+            "sku": {
+                "tier": "Dynamic",
+                "name": "Y1"
+            },
+            "properties": {
+                "reserved": true
+            }
+        },
+        {
+            "name": "[parameters('functionAppName')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2016-03-01",
+            "location": "[resourceGroup().location]",
+            "kind": "functionapp,linux",
+            "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('planName'))]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[parameters('storageAccountConnectionString')]"
+                        },
+                        {
+                            "name": "AzureWebJobsDashboard",
+                            "value": "[parameters('storageAccountConnectionString')]"
+                        },
+                        {
+                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                            "value": "[parameters('appInsightsInstrumentationKey')]"
+                        },
+                        {
+                            "name": "FUNCTIONS_WORKER_RUNTIME",
+                            "value": "python"
+                        },
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~2"
+                        }
+                    ]
+                },
+                "reserved": true,
+                "linuxFxVersion": "DOCKER|mcr.microsoft.com/azure-functions/python:2.0-python3.6-appservice"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverFarms', parameters('planName'))]"
+            ]
+        }
+    ]
+}

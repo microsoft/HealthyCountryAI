@@ -24,29 +24,19 @@ resource "azurerm_key_vault" "kv" {
 
   sku_name = "standard"
 
-  access_policy {
-    tenant_id = var.tenantId
-    object_id = var.keyVaultUserObjectId
-
-    key_permissions = [
-      "get",
-    ]
-
-    secret_permissions = [
-      "get",
-    ]
-
-    storage_permissions = [
-      "get",
-    ]
-  }
-
   network_acls {
     default_action = "Deny"
     bypass         = "AzureServices"
   }
 
   tags = var.tags
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to access policy because Azure ML has an issue with redeploying Key Vault (https://docs.microsoft.com/bs-latn-ba/azure/machine-learning/service/how-to-create-workspace-template#azure-key-vault-access-policy-and-azure-resource-manager-templates)
+      access_policy
+    ]
+  }
 }
 
 # create Storage Account for data
@@ -69,34 +59,19 @@ resource "azurerm_storage_account" "fnsa" {
   tags                     = var.tags
 }
 
-# create app service plan for functions
+# create app service and plan for functions
 # (the native Terraform provider for ARM doesn't support the `functionapp,linux` kind)
-resource "azurerm_template_deployment" "fn-asp" {
-  name                = "${var.prefix}-fn-asp"
+resource "azurerm_template_deployment" "fn" {
+  name                = "${var.prefix}-fn"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   deployment_mode     = "Incremental"
-  template_body       = "${file("../arm/azuredeploy_fn-asp.json")}"
+  template_body       = "${file("../arm/azuredeploy_fn.json")}"
   parameters = {
-    planName = "${var.prefix}-fn-asp"
-    location = var.location
-    kind     = "functionapp,linux"
-    skuTier  = "Dynamic"
-    skuSize  = "Y1"
-  }
-}
-
-# create app service for functions
-resource "azurerm_function_app" "fn" {
-  name                      = "${var.prefix}fn"
-  resource_group_name       = "${azurerm_resource_group.rg.name}"
-  location                  = "${azurerm_resource_group.rg.location}"
-  app_service_plan_id       = "${azurerm_template_deployment.fn-asp.outputs["planResourceId"]}"
-  storage_connection_string = "${azurerm_storage_account.fnsa.primary_connection_string}"
-
-  app_settings = {
-    "APPINSIGHTS_INSTRUMENTATIONKEY" = "${azurerm_application_insights.ai.instrumentation_key}"
-    "FUNCTIONS_EXTENSION_VERSION" = "~2"
-    "FUNCTIONS_WORKER_RUNTIME" = "python"
+    planName                       = "${var.prefix}fn-asp"
+    functionAppName                = "${var.prefix}fn"
+    location                       = var.location
+    appInsightsInstrumentationKey  = "${azurerm_application_insights.ai.instrumentation_key}"
+    storageAccountConnectionString = "${azurerm_storage_account.fnsa.primary_connection_string}"
   }
 }
 
@@ -120,7 +95,6 @@ resource "azurerm_container_registry" "acr" {
 }
 
 # create a machine learning workspace
-/* TODO Temporarily disabled due to race condition
 resource "azurerm_template_deployment" "aml" {
   name                = "${var.prefix}-aml"
   resource_group_name = "${azurerm_resource_group.rg.name}"
@@ -135,7 +109,6 @@ resource "azurerm_template_deployment" "aml" {
     containerRegistryId   = "${azurerm_container_registry.acr.id}"
   }
 }
-*/
 
 # create cognitive services computer vision project for magpie geese
 resource "azurerm_template_deployment" "vis-geese" {
@@ -164,6 +137,11 @@ resource "azurerm_template_deployment" "vis-grass" {
 }
 
 # outputs
+output "function_app_name" {
+  value = "${var.prefix}fn"
+}
+
+/*
 output "app_insights_key" {
   value = "${azurerm_application_insights.ai.instrumentation_key}"
 }
@@ -172,11 +150,7 @@ output "app_insights_app_id" {
   value = "${azurerm_application_insights.ai.app_id}"
 }
 
-output "function_app_name" {
-  value = "${azurerm_function_app.fn.name}"
-}
-
-/* output "workspace_id" {
+output "workspace_id" {
   value = "${azurerm_template_deployment.aml.outputs["workspaceId"]}"
 }
 
@@ -198,20 +172,5 @@ output "cognitive_vision_grass_key" {
 output "cognitive_vision_grass_endpoint" {
   depends_on = [azurerm_template_deployment.vis-grass, ]
   value      = "${lookup(azurerm_template_deployment.vis-grass.outputs, "cognitiveServicesKey")}"
-} */
-
-/* resource "azurerm_machine_learning_workspace" "aml" {
-  name                 = "${var.prefix}-aml"
-  location             = var.location
-  resource_group_name  = "${azurerm_resource_group.rg.name}"
-  description          = "test aml workspace"
-  friendly_name        = "test aml workspace"
-  key_vault            = "${azurerm_key_vault.kv.id}"
-  storage_account      = "${azurerm_storage_account.sa.id}"
-  application_insights = "${azurerm_application_insights.ai.id}"
-  container_registry   = "${azurerm_container_registry.acr.id}"
-  discovery_url        = "http://test.com"
-  tags = {
-    environment = var.environment
-  }
-} */
+}
+*/
