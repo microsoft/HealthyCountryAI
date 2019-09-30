@@ -24,23 +24,6 @@ resource "azurerm_key_vault" "kv" {
 
   sku_name = "standard"
 
-  access_policy {
-    tenant_id = var.tenantId
-    object_id = var.keyVaultUserObjectId
-
-    key_permissions = [
-      "get",
-    ]
-
-    secret_permissions = [
-      "get",
-    ]
-
-    storage_permissions = [
-      "get",
-    ]
-  }
-
   network_acls {
     default_action = "Deny"
     bypass         = "AzureServices"
