@@ -47,6 +47,12 @@ resource "azurerm_key_vault" "kv" {
   }
 
   tags = var.tags
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to access policy because Azure ML has an issue with redeploying Key Vault (https://docs.microsoft.com/bs-latn-ba/azure/machine-learning/service/how-to-create-workspace-template#azure-key-vault-access-policy-and-azure-resource-manager-templates)
+      access_policy
+    ]
 }
 
 # create Storage Account for data
@@ -105,7 +111,6 @@ resource "azurerm_container_registry" "acr" {
 }
 
 # create a machine learning workspace
-/* TODO Temporarily disabled due to race condition
 resource "azurerm_template_deployment" "aml" {
   name                = "${var.prefix}-aml"
   resource_group_name = "${azurerm_resource_group.rg.name}"
@@ -120,7 +125,6 @@ resource "azurerm_template_deployment" "aml" {
     containerRegistryId   = "${azurerm_container_registry.acr.id}"
   }
 }
-*/
 
 # create cognitive services computer vision project for magpie geese
 resource "azurerm_template_deployment" "vis-geese" {
