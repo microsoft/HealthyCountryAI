@@ -10,7 +10,7 @@ variables:
   terraformStateStorageAccountName: jodownscsirodeploy
   terraformStateStorageContainerName: terraform
   terraformStateStorageBlobName: terraform.tfstate
-  functionAppFolder: functions/createtiles
+  functionAppFolder: functions
 
 steps:
 
