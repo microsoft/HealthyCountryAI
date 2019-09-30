@@ -106,11 +106,11 @@
                         },
                         {
                             "name": "BLOB_ACCOUNT_NAME",
-                            "value": "[parameters('blobAccountName')]"
+                            "value": "[parameters('dataBlobAccountName')]"
                         },
                         {
                             "name": "BLOB_ACCOUNT_KEY",
-                            "value": "[parameters('blobAccountKey')]"
+                            "value": "[parameters('dataBlobAccountKey')]"
                         },
                         {
                             "name": "CUSTOM_VISION_ENDPOINT",
