@@ -35,7 +35,7 @@ steps:
   displayName: 'terraform apply'
   inputs:
     command: apply
-    workingDirectory: '$(System.DefaultWorkingDirectory)/github/terraform'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/terraform'
     environmentServiceNameAzureRM: $(azureSubscriptionServiceConnectionName)
     backendServiceArm: $(azureSubscriptionServiceConnectionName)
     backendAzureRmResourceGroupName: $(terraformStateResourceGroupName)
@@ -68,4 +68,4 @@ steps:
     inlineScript: |
      cd $functionAppFolder
      func azure functionapp publish $function_app_name --python --build-native-deps
-    workingDirectory: '$(System.DefaultWorkingDirectory)/github'
+    workingDirectory: '$(System.DefaultWorkingDirectory)'
