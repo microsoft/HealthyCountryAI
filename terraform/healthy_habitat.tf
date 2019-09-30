@@ -91,13 +91,13 @@ resource "azurerm_function_app" "fn" {
   resource_group_name       = "${azurerm_resource_group.rg.name}"
   location                  = "${azurerm_resource_group.rg.location}"
   app_service_plan_id       = "${azurerm_template_deployment.fn-asp.outputs["planResourceId"]}"
+  kind                      = "functionapp,linux"
   storage_connection_string = "${azurerm_storage_account.fnsa.primary_connection_string}"
 
   app_settings = {
     "APPINSIGHTS_INSTRUMENTATIONKEY" = "${azurerm_application_insights.ai.instrumentation_key}"
     "FUNCTIONS_EXTENSION_VERSION" = "~2"
     "FUNCTIONS_WORKER_RUNTIME" = "python"
-    "TODO_JOHN" = "Hello"
   }
 }
 
