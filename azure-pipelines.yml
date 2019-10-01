@@ -66,6 +66,6 @@ steps:
     azureSubscription: $(azureSubscriptionServiceConnectionName)
     scriptLocation: inlineScript
     inlineScript: |
-     cd $functionAppFolder
+     cd functions
      func azure functionapp publish healthyhabitatfn --python --build-native-deps
     workingDirectory: '$(System.DefaultWorkingDirectory)'
