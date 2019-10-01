@@ -50,6 +50,7 @@ steps:
    $json | Get-Member -type NoteProperty | ForEach-Object {
         $o=$json."$($_.Name)"
         "##vso[task.setvariable variable=$($_.Name)$(if ($o.sensitive -eq "True") {";issecret=true"})]$($o.value)"
+        Write-Host "Creating variable $($_.Name) with value $($o.value)"
     }
   displayName: 'Create Azure Pipelines Variables'
 
@@ -66,6 +67,8 @@ steps:
     azureSubscription: $(azureSubscriptionServiceConnectionName)
     scriptLocation: inlineScript
     inlineScript: |
+     echo $functionAppFolder
+     echo $function_app_name
      cd functions
-     func azure functionapp publish healthyhabitatfn --python --build-native-deps
+     func azure functionapp publish $function_app_name --python --build-native-deps
     workingDirectory: '$(System.DefaultWorkingDirectory)'
