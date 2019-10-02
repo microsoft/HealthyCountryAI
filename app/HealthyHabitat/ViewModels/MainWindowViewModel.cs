@@ -137,6 +137,50 @@
             }
         }
 
+        private bool _signInButtonVisible;
+        public bool SignInButtonVisible
+        {
+            get { return _signInButtonVisible; }
+            set
+            {
+                _signInButtonVisible = value;
+                RaisePropertyChanged("SignInButtonVisible");
+            }
+        }
+
+        private bool _signOutButtonVisible;
+        public bool SignOutButtonVisible
+        {
+            get { return _signOutButtonVisible; }
+            set
+            {
+                _signOutButtonVisible = value;
+                RaisePropertyChanged("SignOutButtonVisible");
+            }
+        }
+
+        private string _signedInUserName;
+        public string SignedInUserName
+        {
+            get { return _signedInUserName; }
+            set
+            {
+                _signedInUserName = value;
+                RaisePropertyChanged("SignedInUserName");
+            }
+        }
+
+        private string _displayMessage;
+        public string DisplayMessage
+        {
+            get { return _displayMessage; }
+            set
+            {
+                _displayMessage = value;
+                RaisePropertyChanged("DisplayMessage");
+            }
+        }
+
         public MainWindowViewModel(IDialogService dialogService)
         {
             NameValueCollection locationSection = (NameValueCollection)ConfigurationManager.GetSection("locations");
