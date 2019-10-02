@@ -443,8 +443,8 @@
                 catch
                 {
                     createContainerOK++;
-                    DisplayMessage += $"...Rety {createContainerOK} of {retryLimit} will start in {retrySeconds} seconds." + Environment.NewLine;
-                    //System.Threading.Thread.Sleep(retrySeconds * 1000); // ToDo: Need to create timer, this will lock UI.
+                    DisplayMessage += $"...Retry {createContainerOK} of {retryLimit} will start in {retrySeconds} seconds." + Environment.NewLine;
+                    await Task.Delay(retrySeconds * 1000);
                 }
 
                 if (createContainerOK == retryLimit)
@@ -499,8 +499,8 @@
                         catch
                         {
                             createBlobOK++;
-                            DisplayMessage += $"...Rety {createBlobOK} of {retryLimit} will start in {retrySeconds} seconds." + Environment.NewLine;
-                            //System.Threading.Thread.Sleep(retrySeconds * 1000); // not sure if this good / bad / ugly.
+                            DisplayMessage += $"...Retry {createBlobOK} of {retryLimit} will start in {retrySeconds} seconds." + Environment.NewLine;
+                            await Task.Delay(retrySeconds * 1000);
                         }
 
                         if (createBlobOK == retryLimit)
