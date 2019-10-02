@@ -403,11 +403,11 @@
 
             string[] subFolders = Directory.GetDirectories(cacheLocation);
 
-            //await CreateStorageContainer();
+            await CreateStorageContainer();
             foreach (string folder in subFolders)
             {
-                await InitiateAzCopy(folder, cacheLocation);
-                //await CreateStorageBlobs(folder, cacheLocation);
+                //await InitiateAzCopy(folder, cacheLocation);
+                await CreateStorageBlobs(folder, cacheLocation);
             }
         }
 
