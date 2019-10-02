@@ -233,6 +233,11 @@
 
             UploadClickCommand = new RelayCommand(() =>
             {
+                if (this.SelectedLocation == null)
+                {
+                    return;
+                }
+
                 LocationDialogVisible = false;
 
                 ProgressVisible = true;
