@@ -48,6 +48,18 @@
             private set;
         }
 
+        public RelayCommand SignInCommand
+        {
+            get;
+            private set;
+        }
+
+        public RelayCommand SignOutCommand
+        {
+            get;
+            private set;
+        }
+
         public ICommand ShowMessageBoxWithMessageCommand { get; }
         #endregion Commands
 
@@ -218,6 +230,18 @@
                 }
 
                 LocationDialogVisible = true;
+            });
+
+            SignInCommand = new RelayCommand(async () =>
+            {
+                await Authorize();
+                DisplayBasicTokenInfo();
+            });
+
+            SignOutCommand = new RelayCommand(async () =>
+            {
+                await DeAuthorize();
+                DisplayBasicTokenInfo();
             });
         }
 
