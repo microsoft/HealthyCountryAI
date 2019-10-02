@@ -21,6 +21,7 @@
     using System.Windows;
     using System.Windows.Input;
     using Microsoft.Identity.Client;
+    using Microsoft.Azure.Storage.Auth;
 
     public class MainWindowViewModel : ViewModelBase
     {
@@ -207,7 +208,7 @@
         {
             // Auth init -------------------------------------------------------------------
             SignInButtonVisible = true;
-            DisplayMessage = "Please sign in to continue";
+            DisplayMessage = "Please sign in.";
             SignedInUserName = "";
             PublicClientApp = PublicClientApplicationBuilder.Create(ClientId)
                 .WithAuthority(AadAuthorityAudience.AzureAdMultipleOrgs)
@@ -336,11 +337,11 @@
         {
             if (AuthResult != null)
             {
-                DisplayMessage = $"User Name: {AuthResult.Account.Username}" + Environment.NewLine + $"Token Expires: {AuthResult.ExpiresOn.ToLocalTime()}";
+                DisplayMessage = $"User Name: {AuthResult.Account.Username}" + Environment.NewLine + $"Token Expires: {AuthResult.ExpiresOn.ToLocalTime()}" + Environment.NewLine;
             }
             else
             {
-                DisplayMessage = "You have been signed out. Please sign in to continue";
+                DisplayMessage = "You have been signed out.";
             }
         }
 
@@ -397,11 +398,145 @@
 
             string[] subFolders = Directory.GetDirectories(cacheLocation);
 
+            //await CreateStorageContainer();
             foreach (string folder in subFolders)
             {
                 await InitiateAzCopy(folder, cacheLocation);
+                //await CreateStorageBlobs(folder, cacheLocation);
             }
-            
+        }
+
+        private async Task CreateStorageContainer()
+        {
+            if (AuthResult == null)
+            {
+                await Authorize();
+            }
+
+            if (AuthResult == null)
+            {
+                return;
+            }
+
+            int retryLimit = 3; // ToDo: ConfigurationManager.AppSettings["RetryLimit"].ToString()
+            int retrySeconds = 30; // ToDo: ConfigurationManager.AppSettings["RetrySeconds"].ToString()
+            string storageAccountName = "onpremisesdiag435"; // ToDo: ConfigurationManager.AppSettings["StorageAccountName"].ToString()
+            string storageContainerName = "container"; // ToDo: ConfigurationManager.AppSettings["StorageContainerName"].ToString()
+
+            TokenCredential tokenCredential = new TokenCredential(AuthResult.AccessToken);
+            StorageCredentials storageCredentials = new StorageCredentials(tokenCredential);
+
+            CloudBlobContainer container = new CloudBlobContainer(
+                new Uri($"https://{storageAccountName}.blob.core.windows.net/{storageContainerName}"),
+                storageCredentials);
+
+            DisplayMessage = $"Creating storage container {container.Uri.ToString()}" + Environment.NewLine;
+
+            int createContainerOK = 0;
+            while (createContainerOK < retryLimit)
+            {
+                try
+                {
+                    container.CreateIfNotExists();
+                    createContainerOK = retryLimit + 1;
+                }
+                catch
+                {
+                    createContainerOK++;
+                    DisplayMessage += $"...Rety {createContainerOK} of {retryLimit} will start in {retrySeconds} seconds." + Environment.NewLine;
+                    //System.Threading.Thread.Sleep(retrySeconds * 1000); // ToDo: Need to create timer, this will lock UI.
+                }
+
+                if (createContainerOK == retryLimit)
+                {
+                    DisplayMessage += $"Error creating container, check that you have the correct permissions for this storage account." + Environment.NewLine;
+                }
+            }
+        }
+
+        private async Task CreateStorageBlobs(string sourceDirectory, string cacheDirectory)
+        {
+            if (AuthResult == null)
+            {
+                return;
+            }
+
+            int retryLimit = 3; // ToDo: ConfigurationManager.AppSettings["RetryLimit"].ToString()
+            int retrySeconds = 30; // ToDo: ConfigurationManager.AppSettings["RetrySeconds"].ToString()
+            string storageAccountName = "onpremisesdiag435"; // ToDo: ConfigurationManager.AppSettings["StorageAccountName"].ToString()
+            string storageContainerName = "container"; // ToDo: ConfigurationManager.AppSettings["StorageContainerName"].ToString()
+
+            TokenCredential tokenCredential = new TokenCredential(AuthResult.AccessToken);
+            StorageCredentials storageCredentials = new StorageCredentials(tokenCredential);
+
+            string sourceDirName = new DirectoryInfo(sourceDirectory).Name;
+
+            foreach (string dir in Directory.GetDirectories(sourceDirectory))
+            {
+                string dirName = new DirectoryInfo(dir).Name;
+                DisplayMessage += $"Uploading {dir}" + Environment.NewLine;
+
+                int uploadDirectoryOK = 0;
+                foreach (string file in Directory.GetFiles(dir))
+                {
+                    string fileName = new FileInfo(file).Name;
+
+                    CloudBlockBlob blob = new CloudBlockBlob(
+                        new Uri($"https://{storageAccountName}.blob.core.windows.net/{storageContainerName}/{sourceDirName}/{dirName}/{fileName}"),
+                        storageCredentials);
+
+                    DisplayMessage += $"Creating storage blob {blob.Uri.ToString()}" + Environment.NewLine;
+
+                    int createBlobOK = 0;
+                    while (createBlobOK < retryLimit)
+                    {
+                        try
+                        {
+                            await blob.UploadFromFileAsync(file);
+                            createBlobOK = retryLimit + 1;
+                            File.Delete(file);
+                        }
+                        catch
+                        {
+                            createBlobOK++;
+                            DisplayMessage += $"...Rety {createBlobOK} of {retryLimit} will start in {retrySeconds} seconds." + Environment.NewLine;
+                            //System.Threading.Thread.Sleep(retrySeconds * 1000); // not sure if this good / bad / ugly.
+                        }
+
+                        if (createBlobOK == retryLimit)
+                        {
+                            DisplayMessage += $"Error creating blob, check that you have the correct permissions for this storage account." + Environment.NewLine;
+                        }
+                    }
+
+                    if (createBlobOK != retryLimit + 1)
+                    {
+                        uploadDirectoryOK++;
+                    }
+
+                    if (uploadDirectoryOK == retryLimit)
+                    {
+                        DisplayMessage += $"Failed upload, too many consecutive errors." + Environment.NewLine;
+                        break;
+                    }
+                }
+
+                if (Directory.GetFiles(dir).Length == 0)
+                {
+                    DisplayMessage += "Upload successful.";
+                    Directory.Delete(dir, true);
+                }
+            }
+
+            if (Directory.GetDirectories(sourceDirectory).Length == 0)
+            {
+                Directory.Delete(sourceDirectory, true);
+            }
+
+            if (Directory.GetDirectories(cacheDirectory).Length == 0)
+            {
+                Directory.Delete(cacheDirectory, true);
+            }
         }
 
         private async Task InitiateAzCopy(string sourceDir, string parentDir)
