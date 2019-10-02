@@ -196,8 +196,8 @@
         }
 
         // Auth definitions ------------------------------------------------------------------- 
-        private readonly string ClientId = "18dd432c-1e9e-4da7-93f6-f7d60e3ea712"; // ToDo: ConfigurationManager.AppSettings["ClientID"].ToString()
-        private readonly string ClientScopes = "user.read https://storage.azure.com/user_impersonation"; // ToDo: ConfigurationManager.AppSettings["ClientScopes"].ToString()
+        private readonly string ClientId = ConfigurationManager.AppSettings["ApplicationId"].ToString();
+        private readonly string ClientScopes = ConfigurationManager.AppSettings["ClientScopes"].ToString();
 
         private IPublicClientApplication PublicClientApp { get; set; }
         private AuthenticationResult AuthResult { get; set; }
@@ -423,10 +423,10 @@
                 return;
             }
 
-            int retryLimit = 3; // ToDo: ConfigurationManager.AppSettings["RetryLimit"].ToString()
-            int retrySeconds = 30; // ToDo: ConfigurationManager.AppSettings["RetrySeconds"].ToString()
-            string storageAccountName = "onpremisesdiag435"; // ToDo: ConfigurationManager.AppSettings["StorageAccountName"].ToString()
-            string storageContainerName = "container"; // ToDo: ConfigurationManager.AppSettings["StorageContainerName"].ToString()
+            int retryLimit = System.Convert.ToInt32(ConfigurationManager.AppSettings["RetryLimit"].ToString());
+            int retrySeconds = System.Convert.ToInt32(ConfigurationManager.AppSettings["RetrySeconds"].ToString());
+            string storageAccountName = ConfigurationManager.AppSettings["StorageAccountName"].ToString();
+            string storageContainerName = ConfigurationManager.AppSettings["ContainerName"].ToString();
 
             TokenCredential tokenCredential = new TokenCredential(AuthResult.AccessToken);
             StorageCredentials storageCredentials = new StorageCredentials(tokenCredential);
@@ -466,10 +466,10 @@
                 return;
             }
 
-            int retryLimit = 3; // ToDo: ConfigurationManager.AppSettings["RetryLimit"].ToString()
-            int retrySeconds = 30; // ToDo: ConfigurationManager.AppSettings["RetrySeconds"].ToString()
-            string storageAccountName = "onpremisesdiag435"; // ToDo: ConfigurationManager.AppSettings["StorageAccountName"].ToString()
-            string storageContainerName = "container"; // ToDo: ConfigurationManager.AppSettings["StorageContainerName"].ToString()
+            int retryLimit = System.Convert.ToInt32(ConfigurationManager.AppSettings["RetryLimit"].ToString());
+            int retrySeconds = System.Convert.ToInt32(ConfigurationManager.AppSettings["RetrySeconds"].ToString());
+            string storageAccountName = ConfigurationManager.AppSettings["StorageAccountName"].ToString();
+            string storageContainerName = ConfigurationManager.AppSettings["ContainerName"].ToString();
 
             TokenCredential tokenCredential = new TokenCredential(AuthResult.AccessToken);
             StorageCredentials storageCredentials = new StorageCredentials(tokenCredential);
