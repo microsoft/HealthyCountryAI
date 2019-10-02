@@ -258,16 +258,93 @@
 
             SignInCommand = new RelayCommand(async () =>
             {
-                //await Authorize();
-                //DisplayBasicTokenInfo();
+                await Authorize();
+                DisplayBasicTokenInfo();
             });
 
             SignOutCommand = new RelayCommand(async () =>
             {
-                //await DeAuthorize();
-                //DisplayBasicTokenInfo();
+                await DeAuthorize();
+                DisplayBasicTokenInfo();
             });
         }
+
+        // Auth -------------------------------------------------------------------
+        private async Task Authorize()
+        {
+            AuthResult = null;
+
+            // It's good practice to not do work on the UI thread, so use ConfigureAwait(false) whenever possible.            
+            IEnumerable<IAccount> accounts = await PublicClientApp.GetAccountsAsync().ConfigureAwait(true);
+            IAccount firstAccount = accounts.FirstOrDefault();
+
+            try
+            {
+                AuthResult = await PublicClientApp.AcquireTokenSilent(ClientScopes.Split(), firstAccount)
+                                                  .ExecuteAsync();
+            }
+            catch (MsalUiRequiredException ex)
+            {
+                // A MsalUiRequiredException happened on AcquireTokenSilentAsync. This indicates you need to call AcquireTokenAsync to acquire a token
+                System.Diagnostics.Debug.WriteLine($"MsalUiRequiredException: {ex.Message}");
+
+                try
+                {
+                    AuthResult = await PublicClientApp.AcquireTokenInteractive(ClientScopes.Split())
+                                                      .ExecuteAsync()
+                                                      .ConfigureAwait(false);
+                }
+                catch (MsalException msalex)
+                {
+                    DisplayMessage = $"Error Acquiring Token:{System.Environment.NewLine}{msalex}";
+                }
+            }
+            catch (Exception ex)
+            {
+                DisplayMessage = $"Error Acquiring Token Silently:{System.Environment.NewLine}{ex}";
+                return;
+            }
+
+            if (AuthResult != null)
+            {
+                SignedInUserName = $"Signed in as: {AuthResult.Account.Username}";
+                SignInButtonVisible = false;
+                SignOutButtonVisible = true;
+            }
+        }
+
+        private async Task DeAuthorize()
+        {
+            IEnumerable<IAccount> accounts = await PublicClientApp.GetAccountsAsync().ConfigureAwait(false);
+            IAccount firstAccount = accounts.FirstOrDefault();
+
+            try
+            {
+                await PublicClientApp.RemoveAsync(firstAccount).ConfigureAwait(false);
+                AuthResult = null;
+                SignedInUserName = "";
+                SignOutButtonVisible = false;
+                SignInButtonVisible = true;
+            }
+            catch (MsalException ex)
+            {
+                DisplayMessage = $"Error signing-out user: {ex.Message}";
+            }
+        }
+
+        public void DisplayBasicTokenInfo()
+        {
+            if (AuthResult != null)
+            {
+                DisplayMessage = $"User Name: {AuthResult.Account.Username}" + Environment.NewLine + $"Token Expires: {AuthResult.ExpiresOn.ToLocalTime()}";
+            }
+            else
+            {
+                DisplayMessage = "You have been signed out. Please sign in to continue";
+            }
+        }
+
+        // End Auth -------------------------------------------------------------------
 
         private async void CopyFilesToLocalCache(string[] files, string location, string season)
         {
