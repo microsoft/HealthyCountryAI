@@ -20,6 +20,7 @@
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Input;
+    using Microsoft.Identity.Client;
 
     public class MainWindowViewModel : ViewModelBase
     {
@@ -193,8 +194,31 @@
             }
         }
 
+        // Auth definitions ------------------------------------------------------------------- 
+        private readonly string ClientId = "18dd432c-1e9e-4da7-93f6-f7d60e3ea712"; // ToDo: ConfigurationManager.AppSettings["ClientID"].ToString()
+        private readonly string ClientScopes = "user.read https://storage.azure.com/user_impersonation"; // ToDo: ConfigurationManager.AppSettings["ClientScopes"].ToString()
+
+        private IPublicClientApplication PublicClientApp { get; set; }
+        private AuthenticationResult AuthResult { get; set; }
+
+        // End Auth definitions -------------------------------------------------------------------
+
         public MainWindowViewModel(IDialogService dialogService)
         {
+            // Auth init -------------------------------------------------------------------
+            SignInButtonVisible = true;
+            DisplayMessage = "Please sign in to continue";
+            SignedInUserName = "";
+            PublicClientApp = PublicClientApplicationBuilder.Create(ClientId)
+                .WithAuthority(AadAuthorityAudience.AzureAdMultipleOrgs)
+                .WithLogging((level, message, containsPii) =>
+                {
+                    Debug.WriteLine($"MSAL: {level} {message} ");
+                }, Microsoft.Identity.Client.LogLevel.Warning, enablePiiLogging: false, enableDefaultPlatformLogging: true)
+                .Build();
+
+            // End Auth init -------------------------------------------------------------------
+
             NameValueCollection locationSection = (NameValueCollection)ConfigurationManager.GetSection("locations");
 
             Locations = new ObservableCollection<Location>();
@@ -234,14 +258,14 @@
 
             SignInCommand = new RelayCommand(async () =>
             {
-                await Authorize();
-                DisplayBasicTokenInfo();
+                //await Authorize();
+                //DisplayBasicTokenInfo();
             });
 
             SignOutCommand = new RelayCommand(async () =>
             {
-                await DeAuthorize();
-                DisplayBasicTokenInfo();
+                //await DeAuthorize();
+                //DisplayBasicTokenInfo();
             });
         }
 
