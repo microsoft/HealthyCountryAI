@@ -61,4 +61,4 @@ def load_blob(image_obj, blob_file_name, project_id):
                 for image_create_result in result.images:
                     print("Image status: ", image_create_result.status)
             count += 1
-    return "Success"
+    return("Success")
