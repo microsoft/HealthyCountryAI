@@ -230,14 +230,15 @@
 
             foreach (string folder in subFolders)
             {
-                InitiateAzCopy(folder);
+                await InitiateAzCopy(folder, cacheLocation);
             }
             
         }
 
-        private async Task InitiateAzCopy(string sourceDir)
+        private async Task InitiateAzCopy(string sourceDir, string parentDir)
         {
-            StringBuilder command = new StringBuilder("/C azcopy cp \"[sourceDir]\" \"[sasUri]\" --recursive=true --put-md5");
+            // cmd command to run AzCopy and remove local cache folder
+            StringBuilder command = new StringBuilder("/C azcopy cp \"[sourceDir]\" \"[sasUri]\" --recursive=true --put-md5 & rmdir /q/s \"[parentDir]\"");
 
             string account = ConfigurationManager.AppSettings["storageAccountName"];
             string containerName = ConfigurationManager.AppSettings["containerName"];
@@ -256,6 +257,7 @@
 
             command.Replace("[sourceDir]", sourceDir);
             command.Replace("[sasUri]", sasUri);
+            command.Replace("[parentDir]", parentDir);
 
             string location = AppDomain.CurrentDomain.BaseDirectory + "AzCopy";
 
@@ -274,13 +276,7 @@
                 cmd.StartInfo.Arguments = command.ToString(); ;
 
                 cmd.Start();
-                //cmd.StandardInput.WriteLine(location);
-                //cmd.StandardInput.WriteLine(command);
             }
-
-            // Todo
-            // Run Az-copy with one manifest per uplaod process. 
-            // Delete local cache
         }
 
         private static string GetContainerSasUri(CloudBlobContainer container, string storedPolicyName = null)
