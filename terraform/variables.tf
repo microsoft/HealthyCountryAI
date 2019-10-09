@@ -1,5 +1,5 @@
 variable "tenantId" {
-  default = "de85fb3a-913e-44fd-9b1e-982d9076b94a"
+  default = ""
 }
 
 variable "location" {
