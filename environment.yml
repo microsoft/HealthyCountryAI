@@ -8,9 +8,11 @@ dependencies:
   - pip
   - shapely
   - pip:
+    - albumentations
     - azureml-sdk[notebooks,automl]
     - azure-cognitiveservices-vision-customvision
     - azure-storage
     - azure-functions
     - imgaug
     - python-dotenv
+    - segmentation-models
