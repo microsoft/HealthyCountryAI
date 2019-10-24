@@ -89,6 +89,8 @@ target/
 .mypy_cache/
 
 # Terraform providers
-/.terraform/
+/terraform/.terraform/
+
+*.out
 
 app/HealthyHabitat/obj/

@@ -4,7 +4,7 @@ terraform {
 
 # configure the provider
 provider "azurerm" {
-  version = "~> 1.34" // was 1.35.0 but this caused an error on Azure Pipelines
+  version = "1.34" // was 1.35.0 but this caused an error on Azure Pipelines
 }
 
 # create resource group
@@ -74,8 +74,8 @@ resource "azurerm_template_deployment" "fn" {
     storageAccountConnectionString = "${azurerm_storage_account.fnsa.primary_connection_string}"
     dataBlobAccountName            = "${azurerm_storage_account.fnsa.name}"
     dataBlobAccountKey             = "${azurerm_storage_account.fnsa.primary_access_key}"
-    customVisionEndpoint           = "${lookup(azurerm_template_deployment.vis-geese.outputs, "cognitiveServicesKey")}" # TODO assuming using the geese one
-    customVisionTrainingKey        = "${lookup(azurerm_template_deployment.vis-geese.outputs, "cognitiveServicesEndpoint")}" # TODO assuming using the geese one
+    customVisionEndpoint           = "${lookup(azurerm_cognitive_account.vis-geese, "primary_access_key")}" # TODO assuming using the geese one
+    customVisionTrainingKey        = "${lookup(azurerm_cognitive_account.vis-geese, "endpoint")}" # TODO assuming using the geese one
   }
 }
 
@@ -98,6 +98,26 @@ resource "azurerm_container_registry" "acr" {
   tags                = var.tags
 }
 
+/*
+# create a machine learning workspace
+resource "azurerm_machine_learning_workspace" "aml" {
+  name                 = "${var.prefix}-aml"
+  location             = var.location
+  resource_group_name  = "${azurerm_resource_group.rg.name}"
+  description          = "test aml workspace"
+  friendly_name        = "test aml workspace"
+  key_vault            = "${azurerm_key_vault.kv.id}"
+  storage_account      = "${azurerm_storage_account.sa.id}"
+  application_insights = "${azurerm_application_insights.ai.id}"
+  container_registry   = "${azurerm_container_registry.acr.id}"
+  discovery_url        = "http://test.com"
+  tags                 = var.tags
+  identity {
+    type = "SystemAssigned"
+  }
+}
+*/
+
 # create a machine learning workspace
 resource "azurerm_template_deployment" "aml" {
   name                = "${var.prefix}-aml"
@@ -115,29 +135,29 @@ resource "azurerm_template_deployment" "aml" {
 }
 
 # create cognitive services computer vision project for magpie geese
-resource "azurerm_template_deployment" "vis-geese" {
+resource "azurerm_cognitive_account" "vis-geese" {
   name                = "${var.prefix}-vis-geese"
   resource_group_name = "${azurerm_resource_group.rg.name}"
-  deployment_mode     = "Incremental"
-  template_body       = "${file("../arm/azuredeploy_vis.json")}"
-  parameters = {
-    accountName = "${var.prefix}-vis-geese"
-    location    = var.location
-    sku         = "S1"
+  kind                = "ComputerVision"
+  location            = var.location
+  sku {
+    name = "S1"
+    tier = "Standard"
   }
+  tags = var.tags
 }
 
 # create cognitive services computer vision project for parra grass
-resource "azurerm_template_deployment" "vis-grass" {
+resource "azurerm_cognitive_account" "vis-grass" {
   name                = "${var.prefix}-vis-grass"
   resource_group_name = "${azurerm_resource_group.rg.name}"
-  deployment_mode     = "Incremental"
-  template_body       = "${file("../arm/azuredeploy_vis.json")}"
-  parameters = {
-    accountName = "${var.prefix}-vis-grass"
-    location    = var.location
-    sku         = "S1"
+  kind                = "ComputerVision"
+  location            = var.location
+  sku {
+    name = "S1"
+    tier = "Standard"
   }
+  tags = var.tags
 }
 
 # outputs
@@ -145,7 +165,6 @@ output "function_app_name" {
   value = "${var.prefix}fn"
 }
 
-/*
 output "app_insights_key" {
   value = "${azurerm_application_insights.ai.instrumentation_key}"
 }
@@ -154,27 +173,27 @@ output "app_insights_app_id" {
   value = "${azurerm_application_insights.ai.app_id}"
 }
 
-output "workspace_id" {
-  value = "${azurerm_template_deployment.aml.outputs["workspaceId"]}"
+/* output "workspace_id" {
+  value = "${lookup(azurerm_machine_learning_workspace.aml, "workspaceId")}"
 }
 
 output "cognitive_vision_geese_key" {
-  depends_on = [azurerm_template_deployment.vis-geese, ]
-  value      = "${lookup(azurerm_template_deployment.vis-geese.outputs, "cognitiveServicesKey")}"
+  depends_on = [azurerm_cognitive_account.vis-geese, ]
+  value      = "${lookup(azurerm_cognitive_account.vis-geese, "cognitiveServicesKey")}"
 }
 
 output "cognitive_vision_geese_endpoint" {
-  depends_on = [azurerm_template_deployment.vis-geese, ]
-  value      = "${lookup(azurerm_template_deployment.vis-geese.outputs, "cognitiveServicesEndpoint")}"
+  depends_on = [azurerm_cognitive_account.vis-geese, ]
+  value      = "${lookup(azurerm_cognitive_account.vis-geese, "cognitiveServicesEndpoint")}"
 }
 
 output "cognitive_vision_grass_key" {
-  depends_on = [azurerm_template_deployment.vis-grass, ]
-  value      = "${lookup(azurerm_template_deployment.vis-grass.outputs, "cognitiveServicesKey")}"
+  depends_on = [azurerm_cognitive_account.vis-grass, ]
+  value      = "${lookup(azurerm_cognitive_account.vis-grass, "cognitiveServicesKey")}"
 }
 
 output "cognitive_vision_grass_endpoint" {
-  depends_on = [azurerm_template_deployment.vis-grass, ]
-  value      = "${lookup(azurerm_template_deployment.vis-grass.outputs, "cognitiveServicesKey")}"
+  depends_on = [azurerm_cognitive_account.vis-grass, ]
+  value      = "${lookup(azurerm_cognitive_account.vis-grass, "cognitiveServicesKey")}"
 }
-*/
+ */
