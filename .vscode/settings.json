@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "c:\\Users\\krbock\\AppData\\Local\\Continuum\\miniconda3\\envs\\HealthyHabitatAI\\python.exe",
+    "python.pythonPath": "C:\\Users\\stvanbod\\.conda\\envs\\HealthyHabitat\\python.exe",
     "azureFunctions.deploySubpath": "src/src.zip",
     "azureFunctions.projectLanguage": "Python",
     "azureFunctions.projectRuntime": "~2",

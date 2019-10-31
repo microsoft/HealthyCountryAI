@@ -14,5 +14,6 @@ dependencies:
     - azure-storage
     - azure-functions
     - imgaug
+    - imutil
     - python-dotenv
     - segmentation-models
