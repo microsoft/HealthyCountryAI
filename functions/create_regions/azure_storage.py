@@ -20,7 +20,7 @@ def blob_service_create_blob_from_bytes(account_name, storage_key, container_nam
 
 def blob_service_get_blob_to_bytes(account_name, storage_key, container_name, blob_name):
     block_blob_service = get_block_blob_service(account_name, storage_key)
-    block_blob_service.get_blob_to_bytes(container_name, blob_name)
+    return block_blob_service.get_blob_to_bytes(container_name, blob_name)
 
 def blob_service_get_blob_to_path(account_name, storage_key, container_name, blob_name, file_path):
     block_blob_service = get_block_blob_service(account_name, storage_key)
