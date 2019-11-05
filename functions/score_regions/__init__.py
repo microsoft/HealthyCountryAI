@@ -140,7 +140,8 @@ def score_regions_from_blob(body):
                         logging.info(prediction.tag_id)
                         logging.info(prediction.tag_name)
                         logging.info(prediction.probability)
-                        sql_database.insert_animal_result(date_of_flight, location_of_flight, season, blob_name, region_name, prediction.tag_name, prediction.probability, '')
+
+                        sql_database.insert_animal_result(date_of_flight, location_of_flight, season, blob_name, region_name, prediction.tag_name, prediction.probability, logging)
                 elif model_type == 'parragrass':
                     pass
 
