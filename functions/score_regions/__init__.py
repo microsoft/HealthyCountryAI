@@ -87,7 +87,7 @@ def score_regions_from_blob(body):
 
         '''
         Having got to here unpacking the variables above to work out which CustomVision.ai Project/Iteration to call...for the moment
-        instead, we're going to hard code (0_0) the Project Id and Iteration Id :(
+        instead, we're going to get the Project Id and Iteration Id from configuration...
         '''
         iteration_name = ''
 
@@ -98,12 +98,15 @@ def score_regions_from_blob(body):
             iteration_name = common.custom_vision_parragrass_iteration_name
             project_id = common.custom_vision_parragrass_project_id
 
-        logging.info(model_type)
         logging.info(iteration_name)
         logging.info(project_id)
 
         if iteration_name == '':
             logging.error('Set environment variables for CUSTOM_VISION_ANIMAL_ITERATION_NAME and CUSTOM_VISION_PARRAGRASS_ITERATION_NAME')
+            return ''
+
+        if project_id == '':
+            logging.error('Set environment variables for CUSTOM_VISION_ANIMAL_PROJECT_ID and CUSTOM_VISION_PARRAGRASS_PROJECT_ID')
             return ''
 
         blob = azure_storage.blob_service_get_blob_to_bytes(common.healthy_habitat_storage_account_name, common.healthy_habitat_storage_account_key, container_name, blob_name)
@@ -127,20 +130,24 @@ def score_regions_from_blob(body):
                 region_name = '{0}_Region_{1}.jpg'.format(blob_name.split('.')[0], count)
                 logging.info('Scoring {0}...'.format(region_name))
 
-                result = custom_vision.detect_image(project_id, iteration_name, buffer)
+                if model_type == 'animals':
+                    result = custom_vision.detect_image(project_id, iteration_name, buffer)
 
-                logging.info(result)
+                    logging.info(result)
 
-                for prediction in result.predictions:
-                    logging.info(prediction.bounding_box)
-                    logging.info(prediction.tag_id)
-                    logging.info(prediction.tag_name)
-                    logging.info(prediction.probability)
-                    sql_database.insert_animal_result(date_of_flight, location_of_flight, season, blob_name, region_name, prediction.tag_name, prediction.probability, '')
+                    for prediction in result.predictions:
+                        logging.info(prediction.bounding_box)
+                        logging.info(prediction.tag_id)
+                        logging.info(prediction.tag_name)
+                        logging.info(prediction.probability)
+
+                        sql_database.insert_animal_result(date_of_flight, location_of_flight, season, blob_name, region_name, prediction.tag_name, prediction.probability, logging)
+                elif model_type == 'parragrass':
+                    pass
 
                 count += 1
         
-        logging.info('Created {0}.'.format(count))
+        logging.info('Scored {0}.'.format(count))
 
         return 'Success'
     else:
