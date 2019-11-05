@@ -130,23 +130,33 @@ def score_regions_from_blob(body):
                 region_name = '{0}_Region_{1}.jpg'.format(blob_name.split('.')[0], count)
                 logging.info('Scoring {0}...'.format(region_name))
 
+                result = None
+
                 if model_type == 'animals':
                     result = custom_vision.detect_image(project_id, iteration_name, buffer)
 
                     logging.info(result)
-
+                    
                     for prediction in result.predictions:
-                        logging.info(prediction.bounding_box)
                         logging.info(prediction.tag_id)
                         logging.info(prediction.tag_name)
                         logging.info(prediction.probability)
-
+                        
                         sql_database.insert_animal_result(date_of_flight, location_of_flight, season, blob_name, region_name, prediction.tag_name, prediction.probability, logging)
                 elif model_type == 'parragrass':
-                    pass
+                    result = custom_vision.classify_image(project_id, iteration_name, buffer)
 
+                    logging.info(result)
+                    
+                    for prediction in result.predictions:
+                        logging.info(prediction.tag_id)
+                        logging.info(prediction.tag_name)
+                        logging.info(prediction.probability)
+                        
+                        sql_database.insert_animal_result(date_of_flight, location_of_flight, season, blob_name, region_name, prediction.tag_name, prediction.probability, logging)
+                
                 count += 1
-        
+
         logging.info('Scored {0}.'.format(count))
 
         return 'Success'

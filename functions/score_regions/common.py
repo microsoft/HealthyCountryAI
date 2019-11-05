@@ -18,4 +18,10 @@ healthy_habitat_storage_account_name = os.getenv('HEALTHY_HABITAT_AI_STORAGE_ACC
 
 healthy_habitat_storage_account_key = os.getenv('HEALTHY_HABITAT_AI_STORAGE_ACCOUNT_KEY')
 
+image_resize_height = os.getenv('IMAGE_RESIZE_HEIGHT')
+
+image_resize_width = os.getenv('IMAGE_RESIZE_WIDTH')
+
+resized_container_name = 'resized'
+
 sql_database_password = os.getenv('SQL_DATABASE_PASSWORD')
