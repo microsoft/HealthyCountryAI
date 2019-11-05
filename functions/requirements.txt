@@ -3,3 +3,4 @@ azure-cognitiveservices-vision-customvision
 azure-storage
 numpy
 Pillow
+pyodbc
