@@ -147,7 +147,7 @@ def score_regions_from_blob(body):
 
                 count += 1
         
-        logging.info('Created {0}.'.format(count))
+        logging.info('Scored {0}.'.format(count))
 
         return 'Success'
     else:
