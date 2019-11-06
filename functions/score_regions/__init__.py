@@ -181,4 +181,4 @@ def is_subscription_validation_event(body):
 
 def resize_image(url, data):
     response = requests.post(url, data=data)
-    return response.content.value
+    return response.content.decode("utf-8") 
