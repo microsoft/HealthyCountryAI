@@ -170,16 +170,15 @@ def get_response(body):
 def is_blob_created_event(body):
     logging.info('In is_blob_created_event...')
     logging.info(body)
-    logging.info(body[0])
     logging.info(body[0]['eventType'])
     return body and body[0] and body[0]['eventType'] and body[0]['eventType'] == "Microsoft.Storage.BlobCreated"
 
 def is_subscription_validation_event(body):
     logging.info('In is_subscription_validation_event...')
     logging.info(body)
-    logging.info(body[0])
     logging.info(body[0]['eventType'])
     return body and body[0] and body[0]['eventType'] and body[0]['eventType'] == "Microsoft.EventGrid.SubscriptionValidationEvent"
 
 def resize_image(url, data):
-    return requests.post(url, data=data)
+    response = requests.post(url, data=data)
+    return response.content.value

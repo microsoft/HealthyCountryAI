@@ -50,7 +50,11 @@ def resize_blob(body):
 
     azure_storage.blob_service_create_blob_from_bytes(common.healthy_habitat_storage_account_name, common.healthy_habitat_storage_account_key, common.resized_container_name, path, buffer.getvalue())
 
-    sas_url = azure_storage.blob_service_generate_blob_shared_access_signature(common.healthy_habitat_storage_account_name, common.healthy_habitat_storage_account_key, container_name, path)
+    sas = azure_storage.blob_service_generate_blob_shared_access_signature(common.healthy_habitat_storage_account_name, common.healthy_habitat_storage_account_key, common.resized_container_name, path)
+
+    url_parts = url.split('/')
+
+    sas_url = '{0}//{1}/{2}/{3}/{4}/{5}/{6}?{7}'.format(url_parts[0], url_parts[2], common.resized_container_name, url_parts[3], url_parts[4], url_parts[5], url_parts[6], sas)
     logging.info(sas_url)
 
     return sas_url
