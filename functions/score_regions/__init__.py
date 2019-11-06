@@ -1,4 +1,4 @@
-import io, json, logging, os
+import io, json, logging, os, requests
 import azure.functions as func
 import numpy as np
 from . import azure_storage
@@ -12,15 +12,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     Create regions from a larger image, score with CustomVision.ai, and save to Storage.
     '''
     logging.info('Score Regions Function received a request.')
-
-    logging.info(os.getenv('CUSTOM_VISION_ANIMAL_ITERATION_NAME'))
-    logging.info(os.getenv('CUSTOM_VISION_ANIMAL_PROJECT_ID'))
-    logging.info(os.getenv('CUSTOM_VISION_PARRAGRASS_ITERATION_NAME'))
-    logging.info(os.getenv('CUSTOM_VISION_PARRAGRASS_PROJECT_ID'))
-    logging.info(os.getenv('CUSTOM_VISION_PREDICTION_KEY'))
-    logging.info(os.getenv('CUSTOM_VISION_TRAINING_KEY'))
-    logging.info(os.getenv('HEALTHY_HABITAT_AI_STORAGE_ACCOUNT_NAME'))
-    logging.info(os.getenv('HEALTHY_HABITAT_AI_STORAGE_ACCOUNT_KEY'))
 
     body = req.get_json()
 
@@ -61,6 +52,12 @@ def score_regions_from_blob(body):
 
     blob_name = url.split('/', 4)[-1]
     logging.info(blob_name)
+
+    data = '{0}'.format(body).replace('\'', '"')
+    logging.info(data)
+
+    sas_url = resize_image(common.resize_images_url, data)
+    logging.info(sas_url)
 
     projects = custom_vision.get_projects()
 
@@ -142,7 +139,7 @@ def score_regions_from_blob(body):
                         logging.info(prediction.tag_name)
                         logging.info(prediction.probability)
                         
-                        sql_database.insert_animal_result(date_of_flight, location_of_flight, season, blob_name, region_name, prediction.tag_name, prediction.probability, logging)
+                        sql_database.insert_animal_result(date_of_flight, location_of_flight, season, blob_name, region_name, prediction.tag_name, prediction.probability, sas_url, logging)
                 elif model_type == 'parragrass':
                     result = custom_vision.classify_image(project_id, iteration_name, buffer)
 
@@ -153,7 +150,7 @@ def score_regions_from_blob(body):
                         logging.info(prediction.tag_name)
                         logging.info(prediction.probability)
                         
-                        sql_database.insert_animal_result(date_of_flight, location_of_flight, season, blob_name, region_name, prediction.tag_name, prediction.probability, logging)
+                        sql_database.insert_paragrass_result(date_of_flight, location_of_flight, season, blob_name, region_name, prediction.tag_name, prediction.probability, sas_url, logging)
                 
                 count += 1
 
@@ -181,3 +178,7 @@ def is_subscription_validation_event(body):
     logging.info(body)
     logging.info(body[0]['eventType'])
     return body and body[0] and body[0]['eventType'] and body[0]['eventType'] == "Microsoft.EventGrid.SubscriptionValidationEvent"
+
+def resize_image(url, data):
+    response = requests.post(url, data=data)
+    return response.content.value

@@ -24,4 +24,12 @@ image_resize_width = os.getenv('IMAGE_RESIZE_WIDTH')
 
 resized_container_name = 'resized'
 
+resize_images_url = os.getenv('RESIZE_IMAGES_URL')
+
+sql_database = os.getenv('SQL_DATABASE')
+
 sql_database_password = os.getenv('SQL_DATABASE_PASSWORD')
+
+sql_database_username = os.getenv('SQL_DATABASE_USERNAME')
+
+sql_server = os.getenv('SQL_SERVER')
