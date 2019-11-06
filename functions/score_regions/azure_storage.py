@@ -1,5 +1,7 @@
+from datetime import datetime, timedelta
 from azure.common import AzureMissingResourceHttpError
 from azure.storage.blob import BlockBlobService, PublicAccess
+from azure.storage.blob.models import BlobPermissions
 from azure.storage.file import FileService
 from azure.storage.table import TableService, Entity
 
@@ -17,6 +19,14 @@ def blob_service_create_container(account_name, storage_key, container_name):
 def blob_service_create_blob_from_bytes(account_name, storage_key, container_name, blob_name, blob):
     block_blob_service = get_block_blob_service(account_name, storage_key)
     block_blob_service.create_blob_from_bytes(container_name, blob_name, blob)
+
+def blob_service_generate_blob_shared_access_signature(account_name, storage_key, container_name, blob_name):
+    blob_permissions = BlobPermissions(read=True)
+    start = datetime.now()
+    expiry = datetime.now() + timedelta(years=1)
+
+    block_blob_service = get_block_blob_service(account_name, storage_key)
+    return block_blob_service.generate_blob_shared_access_signature(container_name, blob_name, permission=blob_permissions, expiry=expiry, start=start, protocol='https')
 
 def blob_service_get_blob_to_bytes(account_name, storage_key, container_name, blob_name):
     block_blob_service = get_block_blob_service(account_name, storage_key)
