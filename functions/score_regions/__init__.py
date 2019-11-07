@@ -56,7 +56,7 @@ def score_regions_from_blob(body):
     data = '{0}'.format(body).replace('\'', '"')
     logging.info(data)
 
-    sas_url = resize_image(common.resize_images_url, data)
+    sas_url = resize_image(container_name, blob_name, url)
     logging.info(sas_url)
 
     projects = custom_vision.get_projects()
@@ -179,6 +179,32 @@ def is_subscription_validation_event(body):
     logging.info(body[0]['eventType'])
     return body and body[0] and body[0]['eventType'] and body[0]['eventType'] == "Microsoft.EventGrid.SubscriptionValidationEvent"
 
-def resize_image(url, data):
-    response = requests.post(url, data=data)
-    return response.content.decode("utf-8") 
+
+def resize_image(container_name, blob_name, url):
+    logging.info('In resize_image...')
+
+    height = int(common.image_resize_height) 
+    width = int(common.image_resize_width)
+
+    blob = azure_storage.blob_service_get_blob_to_bytes(common.healthy_habitat_storage_account_name, common.healthy_habitat_storage_account_key, container_name, blob_name)
+
+    image = Image.open(io.BytesIO(blob.content))
+    logging.info(image.size)
+
+    image = image.resize((width, height))
+    logging.info(image.size)
+
+    buffer = io.BytesIO()
+    image.save(buffer, format='JPEG')
+
+    path = '{0}/{1}'.format(container_name, blob_name)
+
+    azure_storage.blob_service_create_blob_from_bytes(common.healthy_habitat_storage_account_name, common.healthy_habitat_storage_account_key, common.resized_container_name, path, buffer.getvalue())
+
+    sas = azure_storage.blob_service_generate_blob_shared_access_signature(common.healthy_habitat_storage_account_name, common.healthy_habitat_storage_account_key, common.resized_container_name, path)
+
+    url_parts = url.split('/')
+
+    sas_url = '{0}//{1}/{2}/{3}/{4}/{5}/{6}?{7}'.format(url_parts[0], url_parts[2], common.resized_container_name, url_parts[3], url_parts[4], url_parts[5], url_parts[6], sas)
+
+    return sas_url
