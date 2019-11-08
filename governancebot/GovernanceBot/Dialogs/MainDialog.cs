@@ -101,7 +101,7 @@ namespace GovernanceBot.Dialogs
 
                     // our function key
 
-                    var serviceUrl = "https://prod-03.australiaeast.logic.azure.com:443/workflows/06864bc3633946ccb7e4a3379399be9b/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=LoR3m_K4PeRC1O_hq81WfAQRmR2EL4n4jGUPps5kllY";
+                    var serviceUrl = "LOGIC APP URL";
 
                     // upload the data using Post mehtod
                     string bodyObject = "{}";
