@@ -214,15 +214,21 @@
                 }
             }
 
+            string lastModifiedDateTime = string.Empty;
+
             foreach (string filename in manifest)
             {
-                var lastModifiedDateTime = System.IO.File.GetLastWriteTime(filename);
+                if (lastModifiedDateTime == string.Empty)
+                {
+                    var lastWriteTime = System.IO.File.GetLastWriteTime(filename);
+                    lastModifiedDateTime = lastWriteTime.ToString("yyyy'-'MM'-'dd'-'HH") + "00";
+                }
 
-                string destination = System.IO.Path.Combine(cacheLocation, type, lastModifiedDateTime.ToString("yyyy'-'MM'-'dd'-'HH") + "00");
+                string destination = Path.Combine(cacheLocation, type, lastModifiedDateTime);
 
-                System.IO.Directory.CreateDirectory(destination);
+                Directory.CreateDirectory(destination);
 
-                string destinationFile = System.IO.Path.Combine(destination, System.IO.Path.GetFileName(filename));
+                string destinationFile = Path.Combine(destination, Path.GetFileName(filename));
 
                 fileCopyManifest.Add(filename, destinationFile);
                 var fileInfo = new FileInfo(filename);
