@@ -149,7 +149,7 @@
             Stroke="#0034495E"
             StrokeThickness="40"
             StrokeMode="Inside"
-            EndLineCap="Flat" Margin="10,-23,-10,23" />
+            EndLineCap="Flat" Margin="28,-5,32,65" />
             <TextBlock Text="{Binding Path=Angle, ElementName=cpb, Converter={StaticResource AngleToPercentageConverter}, StringFormat={}Copying {0:0}%, FallbackValue=0}"
                    FontSize="65"
                    FontWeight="Bold"
@@ -159,14 +159,14 @@
                    HorizontalAlignment="Center" VerticalAlignment="Center"
                    Foreground="#FF9A4133"></TextBlock>
         </Grid>
-        <Grid Name="gridLocationDialog" Visibility="{Binding Path=LocationDialogVisible, Converter={StaticResource VisibilityConverter}, FallbackValue=Collapsed}">
+        <Grid Name="GridLocationDialog" Visibility="{Binding Path=LocationDialogVisible, Converter={StaticResource VisibilityConverter}, FallbackValue=Collapsed}">
             <Ellipse Fill="White" Stroke="#FF9A4133" StrokeThickness="30" />
             <TextBlock Text="Please select the location" 
                    HorizontalAlignment="Center" VerticalAlignment="Center"
                    FontSize="22"
                    FontWeight="Bold"
                    Foreground="#FF9A4133" 
-                   Margin="270,314,270,456">
+                   Margin="240,314,240,456">
             </TextBlock>
             <ComboBox HorizontalAlignment="Left"   
                   Margin="337,361,0,0"   
@@ -175,7 +175,50 @@
                   ItemsSource="{Binding Path=Locations}"    
                   SelectedItem="{Binding Path=SelectedLocation, Mode=TwoWay}"  
                   DisplayMemberPath="Name"/>
-            <Button x:Name="btn_upload" Content="Upload" Margin="338,415,343,266">
+            <Button x:Name="SelectDataTypeButton" Content="Next" Margin="338,415,343,266">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Click">
+                        <command:EventToCommand Command="{Binding NextClickCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <Button.Template>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Grid>
+                            <Ellipse Fill="White" Stroke="#FF9A4133" StrokeThickness="10"/>
+                            <ContentPresenter 
+                            Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                            ContentTemplate="{TemplateBinding ContentTemplate}" >
+                                <ContentPresenter.Resources>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Setter Property="FontSize" Value="24" />
+                                        <Setter Property="FontWeight" Value="Bold" />
+                                        <Setter Property="FontFamily" Value="Arial" />
+                                        <Setter Property="Foreground" Value="#FF9A4133" />
+                                    </Style>
+                                </ContentPresenter.Resources>
+                            </ContentPresenter>
+                        </Grid>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+        </Grid>
+        <Grid Name="GridTypeDialog" Visibility="{Binding Path=TypeDialogVisible, Converter={StaticResource VisibilityConverter}, FallbackValue=Collapsed}">
+            <Ellipse Fill="White" Stroke="#FF9A4133" StrokeThickness="30" />
+            <TextBlock Text="Please select the type of data" 
+                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                   FontSize="22"
+                   FontWeight="Bold"
+                   Foreground="#FF9A4133" 
+                   Margin="240,314,240,456">
+            </TextBlock>
+            <ComboBox HorizontalAlignment="Left"   
+                  Margin="337,361,0,0"   
+                  VerticalAlignment="Top"   
+                  Width="120"
+                  ItemsSource="{Binding Path=Types}"    
+                  SelectedItem="{Binding Path=SelectedType, Mode=TwoWay}"  
+                  DisplayMemberPath="Name"/>
+            <Button x:Name="UploadButton" Content="Upload" Margin="338,415,343,266">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="Click">
                         <command:EventToCommand Command="{Binding UploadClickCommand}" />
@@ -202,7 +245,7 @@
                 </Button.Template>
             </Button>
         </Grid>
-        <Button x:Name="btn_close" Content="Close" HorizontalAlignment="Right" Margin="0,0,0,0" VerticalAlignment="Top" Width="100" Height="100">
+        <Button x:Name="CloseButton" Content="Close" HorizontalAlignment="Right" Margin="0,0,0,0" VerticalAlignment="Top" Width="100" Height="100">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="Click">
                     <command:EventToCommand Command="{Binding ExitCommand}" PassEventArgsToCommand="True" />

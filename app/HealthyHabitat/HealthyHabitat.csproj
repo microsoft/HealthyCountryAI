@@ -93,6 +93,7 @@
     <Compile Include="CustomFrameworkDialogFactory.cs" />
     <Compile Include="Helpers\AsyncFileCopy.cs" />
     <Compile Include="Helpers\Converters.cs" />
+    <Compile Include="Models\Type.cs" />
     <Compile Include="Models\Location.cs" />
     <Compile Include="ViewModelLocator.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />

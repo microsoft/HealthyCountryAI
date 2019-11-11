@@ -6,7 +6,7 @@
     using System.Text;
     using System.Threading.Tasks;
 
-    public class Location
+    public class Type
     {
         private string _id;
 

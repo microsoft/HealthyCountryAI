@@ -2,16 +2,15 @@
 {
     using GalaSoft.MvvmLight;
     using GalaSoft.MvvmLight.Command;
+    using HealthyHabitat.Helpers;
+    using HealthyHabitat.Models;
     using Microsoft.Azure.Storage;
     using Microsoft.Azure.Storage.Blob;
     using MvvmDialogs;
-    using SixSeasons.Helpers;
-    using SixSeasons.Models;
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Collections.Specialized;
-    using System.ComponentModel;
     using System.Configuration;
     using System.Diagnostics;
     using System.IO;
@@ -30,7 +29,19 @@
             private set;
         }
 
+        public RelayCommand<DragEventArgs> DropCommand
+        {
+            get;
+            private set;
+        }
+
         public RelayCommand ExitCommand
+        {
+            get;
+            private set;
+        }
+
+        public RelayCommand NextClickCommand
         {
             get;
             private set;
@@ -42,60 +53,27 @@
             private set;
         }
 
-        public RelayCommand<DragEventArgs> DropCommand
-        {
-            get;
-            private set;
-        }
-
         public ICommand ShowMessageBoxWithMessageCommand { get; }
+
         #endregion Commands
 
         private readonly IDialogService dialogService;
-        //private string confirmation;
 
-        private string _selectedSeason;
+        public ObservableCollection<string> Files { get; set; }
 
-        public string SelectedSeason
+        public ObservableCollection<Location> Locations { get; set; }
+
+        public ObservableCollection<Models.Type> Types { get; set; }
+
+        public Location SelectedLocation { get; set; }
+
+        public string SelectedSeason { get; set; }
+
+        public Models.Type SelectedType { get; set; }
+
+        public string ProgressText
         {
-            get { return _selectedSeason; }
-            set { _selectedSeason = value; }
-        }
-        private ObservableCollection<string> _files;
-
-        public ObservableCollection<string> Files
-        {
-            get { return _files; }
-            set { _files = value; }
-        }
-
-        private ObservableCollection<Location> _locations;
-
-        public ObservableCollection<Location> Locations
-        {
-            get { return _locations; }
-            set { _locations = value; }
-        }
-
-        private Location _selectedLocation;
-
-        public Location SelectedLocation
-        {
-            get { return _selectedLocation; }
-            set { _selectedLocation = value; }
-        }
-
-        //        private readonly BackgroundWorker worker;
-
-        private double _progressValueMax;
-        public double ProgressValueMax
-        {
-            get { return _progressValueMax; }
-            set
-            {
-                _progressValueMax = value;
-                RaisePropertyChanged("ProgressValueMax");
-            }
+            get { return string.Format("{0} %", _progressValue); }
         }
 
         private double _progressValue;
@@ -110,6 +88,17 @@
             }
         }
 
+        private double _progressValueMax;
+        public double ProgressValueMax
+        {
+            get { return _progressValueMax; }
+            set
+            {
+                _progressValueMax = value;
+                RaisePropertyChanged("ProgressValueMax");
+            }
+        }
+
         private bool _progressVisible;
         public bool ProgressVisible
         {
@@ -119,11 +108,6 @@
                 _progressVisible = value;
                 RaisePropertyChanged("ProgressVisible");
             }
-        }
-
-        public string ProgressText
-        {
-            get { return string.Format("{0} %", _progressValue); }
         }
 
         private bool _locationDialogVisible;
@@ -137,36 +121,42 @@
             }
         }
 
+        private bool _typeDialogVisible;
+        public bool TypeDialogVisible
+        {
+            get { return _typeDialogVisible; }
+            set
+            {
+                _typeDialogVisible = value;
+                RaisePropertyChanged("TypeDialogVisible");
+            }
+        }
+
         public MainWindowViewModel(IDialogService dialogService)
         {
             NameValueCollection locationSection = (NameValueCollection)ConfigurationManager.GetSection("locations");
 
             Locations = new ObservableCollection<Location>();
 
-            foreach (var loc in locationSection.AllKeys)
+            foreach (var location in locationSection.AllKeys)
             {
-                Locations.Add(new Location() { Id = loc, Name = locationSection[loc] });
+                Locations.Add(new Location() { Id = location, Name = locationSection[location] });
+            }
+
+            NameValueCollection typeSection = (NameValueCollection)ConfigurationManager.GetSection("types");
+
+            Types = new ObservableCollection<Models.Type>();
+
+            foreach (var type in typeSection.AllKeys)
+            {
+                Types.Add(new Models.Type() { Id = type, Name = typeSection[type] });
             }
 
             this.dialogService = dialogService;
 
-            UploadClickCommand = new RelayCommand(() =>
-            {
-                LocationDialogVisible = false;
-
-                ProgressVisible = true;
-
-                CopyFilesToLocalCache(this.Files.ToArray<string>(), this.SelectedLocation.Id, this.SelectedSeason);
-            });
-
-            ExitCommand = new RelayCommand(() =>
-            {
-                System.Windows.Application.Current.Shutdown();
-            });
-
             DropCommand = new RelayCommand<DragEventArgs>(e =>
             {
-                SelectedSeason = ((System.Windows.Shapes.Path)e.Source).Tag.ToString();//Not safe
+                SelectedSeason = ((System.Windows.Shapes.Path)e.Source).Tag.ToString();
 
                 if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 {
@@ -175,25 +165,44 @@
 
                 LocationDialogVisible = true;
             });
+
+            ExitCommand = new RelayCommand(() =>
+            {
+                System.Windows.Application.Current.Shutdown();
+            });
+
+            NextClickCommand = new RelayCommand(() =>
+            {
+                LocationDialogVisible = false;
+
+                TypeDialogVisible = true;
+            });
+
+            UploadClickCommand = new RelayCommand(() =>
+            {
+                TypeDialogVisible = false;
+
+                //ProgressVisible = true;
+
+                CopyFilesToLocalCache(this.Files.ToArray<string>(), this.SelectedType.Id);
+            });
         }
 
-        private async void CopyFilesToLocalCache(string[] files, string location, string season)
+        private async void CopyFilesToLocalCache(string[] files, string type)
         {
-
             string cacheLocation = System.IO.Path.Combine(ConfigurationManager.AppSettings["localCache"].ToString() ?? AppDomain.CurrentDomain.BaseDirectory, Guid.NewGuid().ToString());
 
-            Dictionary<string, string> fileCopyManifest = new Dictionary<string, string>();
+            var fileCopyManifest = new Dictionary<string, string>();
 
             double size = 0;
 
-            List<string> manifest = new List<string>();
+            var manifest = new List<string>();
 
-            // Test for folders and flatten into files
-            foreach(string filename in files)
+            foreach (string filename in files)
             {
-                FileAttributes attr = File.GetAttributes(filename);
+                var fileAttributes = File.GetAttributes(filename);
 
-                if (attr.HasFlag(FileAttributes.Directory))
+                if (fileAttributes.HasFlag(FileAttributes.Directory))
                 {
                     string[] filePaths = Directory.GetFiles(filename, "*.*", SearchOption.AllDirectories);
 
@@ -207,75 +216,64 @@
 
             foreach (string filename in manifest)
             {
-                DateTime lastModifiedDate = System.IO.File.GetLastWriteTime(filename);
+                var lastModifiedDateTime = System.IO.File.GetLastWriteTime(filename);
 
-                string destination = System.IO.Path.Combine(cacheLocation, string.Format("{0}-{1}", location, season), lastModifiedDate.ToString("yyyy'-'MM'-'dd'-'HH''mm"));
+                string destination = System.IO.Path.Combine(cacheLocation, type, lastModifiedDateTime.ToString("yyyy'-'MM'-'dd'-'HH") + "00");
 
                 System.IO.Directory.CreateDirectory(destination);
 
                 string destinationFile = System.IO.Path.Combine(destination, System.IO.Path.GetFileName(filename));
 
                 fileCopyManifest.Add(filename, destinationFile);
-                FileInfo file = new FileInfo(filename);
-                size += file.Length;
+                var fileInfo = new FileInfo(filename);
+                size += fileInfo.Length;
             }
 
             ProgressValueMax = size;
 
             await AsyncFileCopy.CopyFiles(fileCopyManifest, prog => ProgressValue = prog);
 
-            ProgressVisible = false;
-
             string[] subFolders = Directory.GetDirectories(cacheLocation);
 
             foreach (string folder in subFolders)
             {
-                await InitiateAzCopy(folder, cacheLocation);
+                await RunAzCopy(folder, cacheLocation);
             }
-            
         }
 
-        private async Task InitiateAzCopy(string sourceDir, string parentDir)
+        private async Task RunAzCopy(string sourceDirectory, string parentDirectory)
         {
-            // cmd command to run AzCopy and remove local cache folder
-            StringBuilder command = new StringBuilder("/C azcopy cp \"[sourceDir]\" \"[sasUri]\" --recursive=true --put-md5 & rmdir /q/s \"[parentDir]\"");
+            var command = new StringBuilder("/C azcopy cp \"[sourceDirectory]\" \"[sasUri]\" --recursive=true --put-md5 & rmdir /q/s \"[parentDirectory]\"");
 
             string account = ConfigurationManager.AppSettings["storageAccountName"];
-            string containerName = ConfigurationManager.AppSettings["containerName"];
+            string containerName = this.SelectedLocation.Id + "-" + this.SelectedSeason;
             string key = ConfigurationManager.AppSettings["key"];
 
-            CloudStorageAccount storageAccount = new CloudStorageAccount(
-                new Microsoft.Azure.Storage.Auth.StorageCredentials(account, key), true);
+            var cloudStorageAccount = new CloudStorageAccount(new Microsoft.Azure.Storage.Auth.StorageCredentials(account, key), true);
 
-            // Create a blob client.
-            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+            var cloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();
 
-            // Get a reference to a container named "mycontainer."
-            CloudBlobContainer container = blobClient.GetContainerReference(containerName);
+            var cloudBlobContainer = cloudBlobClient.GetContainerReference(containerName);
 
-            string sasUri = GetContainerSasUri(container);
+            string sasUri = GetContainerSasUri(cloudBlobContainer);
 
-            command.Replace("[sourceDir]", sourceDir);
+            command.Replace("[sourceDirectory]", sourceDirectory);
             command.Replace("[sasUri]", sasUri);
-            command.Replace("[parentDir]", parentDir);
+            command.Replace("[parentDirectory]", parentDirectory);
 
             string location = AppDomain.CurrentDomain.BaseDirectory + "AzCopy";
 
-            using (Process cmd = new Process())
+            using (var process = new Process())
             {
-                cmd.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal;
+                process.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal;
 
-                cmd.StartInfo.FileName = "cmd.exe";
+                process.StartInfo.FileName = "cmd.exe";
 
-                cmd.StartInfo.WorkingDirectory = location;
-                //cmd.StartInfo.CreateNoWindow = true;
-                //cmd.StartInfo.UseShellExecute = false;
-                //cmd.StartInfo.RedirectStandardInput = true;
-                //cmd.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.WorkingDirectory = location;
 
-                cmd.StartInfo.Arguments = command.ToString(); ;
+                process.StartInfo.Arguments = command.ToString();
 
-                cmd.Start();
+                process.Start();
             }
         }
 

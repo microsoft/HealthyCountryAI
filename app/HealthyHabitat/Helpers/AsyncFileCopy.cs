@@ -1,4 +1,4 @@
-﻿namespace SixSeasons.Helpers
+﻿namespace HealthyHabitat.Helpers
 {
     using System;
     using System.Collections.Generic;
@@ -40,7 +40,7 @@
                     total_read += total_read_for_file;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
