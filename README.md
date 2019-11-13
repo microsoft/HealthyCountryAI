@@ -1,7 +1,7 @@
 # Healthy Country AI
 
 ### Overview
-The Healthy Country project in Kakadu is a collaboration between Bininj co-researchers and Indigenous rangers, Kakadu Board of Management, [CSIRO](https://www.csiro.au/), [Parks Australia](https://parksaustralia.gov.au/), [Northern Australia National Environment Science Program (NESP)](https://www.nespnorthern.edu.au/), [University of Western Australia (UWA)](https://www.uwa.edu.au/), [Charles Darwin University (CDU)](https://www.cdu.edu.au/) and [Microsoft](https://www.microsoft.com/en-us/ai/ai-for-earth) to support better decision-making to care for significant species and habitats on Indigenous lands.
+The Healthy Country project in Kakadu is a collaboration between Bininj co-researchers and Indigenous rangers, [Kakadu Board of Management](https://www.directory.gov.au/portfolios/environment-and-energy/director-national-parks/kakadu-board-management), [CSIRO](https://www.csiro.au/), [Parks Australia](https://parksaustralia.gov.au/), [Northern Australia National Environment Science Program (NESP)](https://www.nespnorthern.edu.au/), [University of Western Australia (UWA)](https://www.uwa.edu.au/), [Charles Darwin University (CDU)](https://www.cdu.edu.au/) and [Microsoft](https://www.microsoft.com/en-us/ai/ai-for-earth) to support better decision-making to care for significant species and habitats on Indigenous lands.
 
 The Healthy Habitat AI project consists of three models developed using CustomVision.ai and Azure Machine Learning Service, using RGB images, collected by rangers using an off the shelf affordable drone, DJI Mavic PRO 2, from sites in Kakadu National Park, Australia. The models allow rangers to regularly survey large areas that are difficult to access by converting large volumes of data (1000s of high res photos) into metrics that demonstrate how the identified key values are changing following selected a management methods. The Healthy Habitat AI project represents an end to end solution to support adaptive management with clearly defined success metrics.
 
@@ -24,11 +24,18 @@ Rangers seperate the photos into folders for each site and if multiple surveys h
 
 ![](app/HealthyHabitat/Images/SeasonalWheel.png)
 
-Storage consists of two accounts for data collection -
-* Healthy Habitat Animals (healthyhabitatanimals), and
-* Healthy Habitat Para grass (healthyhabitatparragrass)
-
-Each account uses Blobs only.
+One storage account is used and sub folders are created to differentiate the different sites, seasons, survey times, model types. Files are stored as blobs. For example the structure,
+Storage
+* healthyhabitatai
+Site-season
+- ubir-wurrkeng
+Model type
+- animal
+-datetime (of survey)
+- files
+- habitat
+- datetime of survey
+- files
 
 Data is automatically divided into containers named using the combination of *site* and *season* matching the section of the seasonal wheel images were dragged onto, for example -
 
@@ -42,16 +49,48 @@ Data is automatically divided into containers named using the combination of *si
 Then by the YYY-MM-DD-HHMM the collection occured, for example -
 * 2019-04-03-1050
 
-...
+Two functions are triggered by the successful upload of each photo.
 
-Classes -
+Function 1. Split regions
+The first function splits each photograph into 120 tiles and uploads the tiled images to seasonal projects in custom vision.au for labeling. If a project doesn’t exist, a new customvision.ai project is automatically created using the site-season-type combination described above. End users can then open customvision.ai and label animals (object detection) or habitat(classification) to train the model. As more labels are accumulated for each model users should train the model and publish the new results to improve accuracy.
+
+Function 2. Score regions.
+The second function has three elements.
+Firstly it resizes the high resolution images (15-20mb) and saves a smaller (~1mb) version of the photo with the same name to support quicker rendering on the powerBI dashboard.
+
+The function then uses the available models in customvision.ai to score each tile for dominant habitat type (classification) and animal (object detection). The scores are written out to an SQL database with associated covariates that allow subsequent filtering and analytics in Power BI. In this system a link to a SAS URL for each image is written to the database to provide a direct link back to the photographs using survey date as the key.
+
+##AI/ML models
+Here we have implemented three models, classification, object detection (using customvision.ai) and semantic segmentation (Azure Machine Learning Services).
+
+#customvision.ai models
+
+#Habitat
+For the habitat model We scored the dominant habitat type for each tile (add size) by season and site. We greatly reduced the complexity of the labelling task by limiting the labels to broad habitat types, with more detail provided for our target species, para grass, including a “dead para grass” label which directly relates to the management goals of the rangers and traditional owners. We chose to label 8 broad habitat categories;
+
 * Para grass
-* Burnt Para-grass
+* Water
 * Dense Para-grass
 * Dead Para-grass
-* Wet Para-grass
+* Bare ground
+* Other grass
+* Lily
 * Tree
-* Water
+
+We use a single tag per image using a classification model. This required subject matter experts, in this case researchers who had a good knowledge of the visual characteristics of para grass compared with other native species from aerial photos. Using this method it was necessary make decisions about which habitat type was dominant reducing the complexity of the labelling task but also reducing the detail of the results and leading to difficult labelling decisions in tiles that had diverse habait characteristic, e.g equal parts water, bare ground and paragrass.
+
+#Animal
+For the habitat model subject matter experts (researchers with deep knowledge of vertebrate species in the region) labeled all vertebrate species that were easily identified in the tiles. The focus species, magpie geese, was easily separated from other species so there was a very high confidence in these labels. Other species, such as egrets and spoon bills, were less distinct (from 60m) and were lumped into one category, egrets, which included all white birds. Several other species had very few individuals (<15 labels) and these were excluded. Labels were dominated by magpie geese and egrets, the remaining species were very low. Species labels include:
+
+* Goose
+* Egret
+* Crocodile
+* Stork
+* Kite
+* Darter
+
+
+
 
 ### Machine Learning Workstation
 * Install [Azure Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/)
