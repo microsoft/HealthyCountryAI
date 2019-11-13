@@ -60,8 +60,11 @@ Firstly it resizes the high resolution images (15-20mb) and saves a smaller (~1m
 
 The function then uses the available models in customvision.ai to score each tile for dominant habitat type (classification) and animal (object detection). The scores are written out to an SQL database with associated covariates that allow subsequent filtering and analytics in Power BI. In this system a link to a SAS URL for each image is written to the database to provide a direct link back to the photographs using survey date as the key.
 
-# customvision.ai models
+# AI/ML models
 Here we have implemented three models, classification, object detection (using customvision.ai) and semantic segmentation (Azure Machine Learning Services).
+
+
+# customvision.ai models
 
 ### Habitat
 For the habitat model We scored the dominant habitat type for each tile (add size) by season and site. We greatly reduced the complexity of the labelling task by limiting the labels to broad habitat types, with more detail provided for our target species, para grass, including a “dead para grass” label which directly relates to the management goals of the rangers and traditional owners. We chose to label 8 broad habitat categories;
