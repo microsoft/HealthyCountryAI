@@ -16,7 +16,7 @@ Azure Machine Learning Service:
 
 ### Data Preparation
 
-![](app/HealthyHabitat/Images/Architecture.jpg)
+![](app/HealthyHabitat/Images/Architecture.png)
 
 The rangers and traditional owners, Bininj, selected several sites based on important environmental and cultural values. At each of these sites, a fixed set of transects are programmed into the drone to cover the same area of interest at the same height (60m above from point of take off) each time the area is flown. The drone flys at a set speed and sets capture rate for photos to get a 60% overlap in photos to allow photogramtic stitching. The three areas are flat flood plains so the height remains constant above the survey area. Once the transects are flown the rangers return to home base where they have internet and computers. The Micro-SD card is removed from the drone and inserted into the rangers pc.
 
