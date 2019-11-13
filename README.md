@@ -1,6 +1,8 @@
 # Healthy Country AI
 
 ### Overview
+The Healthy Country project in Kakadu is a collaboration between Bininj co-researchers and Indigenous rangers, Kakadu Board of Management, CSIRO, Parks Australia, Northern Australia National Environment Science Program (NESP), University of Western Australia (UWA) and Charles Darwin University (CDU) and Microsoft to support better decision-making to care for significant species and habitats on Indigenous lands.
+
 The Healthy Habitat AI project consists of four models developed using CustomVision.ai and Azure Machine Learning Service, using images and multi-spectral data, collected by rangers using DJI Mavic 2s, from sites in Kakadu National Park. The models increase the area a ranger is able to assess, by converting large volumes of data into metrics significant to the health of the land.
 
 The models consist of -
