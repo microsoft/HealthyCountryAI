@@ -28,14 +28,14 @@ One storage account is used and sub folders are created to differentiate the dif
 Storage
 * healthyhabitatai
 Site-season
-- ubir-wurrkeng
+* ubir-wurrkeng
 Model type
-- animal
--datetime (of survey)
-- files
-- habitat
-- datetime of survey
-- files
+* animal
+* datetime (of survey)
+* files
+* habitat
+* datetime of survey
+* files
 
 Data is automatically divided into containers named using the combination of *site* and *season* matching the section of the seasonal wheel images were dragged onto, for example -
 
@@ -60,10 +60,8 @@ Firstly it resizes the high resolution images (15-20mb) and saves a smaller (~1m
 
 The function then uses the available models in customvision.ai to score each tile for dominant habitat type (classification) and animal (object detection). The scores are written out to an SQL database with associated covariates that allow subsequent filtering and analytics in Power BI. In this system a link to a SAS URL for each image is written to the database to provide a direct link back to the photographs using survey date as the key.
 
-# AI/ML models
+# customvision.ai models
 Here we have implemented three models, classification, object detection (using customvision.ai) and semantic segmentation (Azure Machine Learning Services).
-
-### customvision.ai models
 
 ### Habitat
 For the habitat model We scored the dominant habitat type for each tile (add size) by season and site. We greatly reduced the complexity of the labelling task by limiting the labels to broad habitat types, with more detail provided for our target species, para grass, including a “dead para grass” label which directly relates to the management goals of the rangers and traditional owners. We chose to label 8 broad habitat categories;
@@ -88,7 +86,6 @@ For the habitat model subject matter experts (researchers with deep knowledge of
 * Stork
 * Kite
 * Darter
-
 
 
 
@@ -119,5 +116,5 @@ When you submit a pull request, a CLA-bot will automatically determine whether y
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
-### License
+# License
 This repository is licensed with the [MIT license](https://github.com/Microsoft/dotnet/blob/master/LICENSE).
