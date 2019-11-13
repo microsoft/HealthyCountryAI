@@ -14,7 +14,7 @@ CustomVision.ai:
 Azure Machine Learning Service:
 * Para grass - Semantic Segmentation (U-Net)
 
-### Data Preparation
+# Data Preparation
 
 ![](app/HealthyHabitat/Images/Architecture.png)
 
@@ -60,12 +60,12 @@ Firstly it resizes the high resolution images (15-20mb) and saves a smaller (~1m
 
 The function then uses the available models in customvision.ai to score each tile for dominant habitat type (classification) and animal (object detection). The scores are written out to an SQL database with associated covariates that allow subsequent filtering and analytics in Power BI. In this system a link to a SAS URL for each image is written to the database to provide a direct link back to the photographs using survey date as the key.
 
-##AI/ML models
+# AI/ML models
 Here we have implemented three models, classification, object detection (using customvision.ai) and semantic segmentation (Azure Machine Learning Services).
 
-#customvision.ai models
+### customvision.ai models
 
-#Habitat
+### Habitat
 For the habitat model We scored the dominant habitat type for each tile (add size) by season and site. We greatly reduced the complexity of the labelling task by limiting the labels to broad habitat types, with more detail provided for our target species, para grass, including a “dead para grass” label which directly relates to the management goals of the rangers and traditional owners. We chose to label 8 broad habitat categories;
 
 * Para grass
@@ -79,7 +79,7 @@ For the habitat model We scored the dominant habitat type for each tile (add siz
 
 We use a single tag per image using a classification model. This required subject matter experts, in this case researchers who had a good knowledge of the visual characteristics of para grass compared with other native species from aerial photos. Using this method it was necessary make decisions about which habitat type was dominant reducing the complexity of the labelling task but also reducing the detail of the results and leading to difficult labelling decisions in tiles that had diverse habait characteristic, e.g equal parts water, bare ground and paragrass.
 
-#Animal
+### Animal
 For the habitat model subject matter experts (researchers with deep knowledge of vertebrate species in the region) labeled all vertebrate species that were easily identified in the tiles. The focus species, magpie geese, was easily separated from other species so there was a very high confidence in these labels. Other species, such as egrets and spoon bills, were less distinct (from 60m) and were lumped into one category, egrets, which included all white birds. Several other species had very few individuals (<15 labels) and these were excluded. Labels were dominated by magpie geese and egrets, the remaining species were very low. Species labels include:
 
 * Goose
@@ -110,3 +110,11 @@ ipython kernel install --user
 ### Field  Local Workstation
 * Install [Azure Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/)
 * Install [Power BI Desktop](https://powerbi.microsoft.com/en-us/desktop/)
+
+
+# Contributing
+This project welcomes contributions and suggestions. Most contributions require you to agree to a Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us the rights to use your contribution. For details, visit [cla.microsoft.com](https://cla.opensource.microsoft.com/).
+
+When you submit a pull request, a CLA-bot will automatically determine whether you need to provide a CLA and decorate the PR appropriately (e.g., label, comment). Simply follow the instructions provided by the bot. You will only need to do this once across all repos using our CLA.
+
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
