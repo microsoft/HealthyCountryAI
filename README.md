@@ -1,16 +1,7 @@
-# Healthy Country AI
+ Healthy Country AI
 
 ### Overview
 The Healthy Country project in Kakadu is a collaboration between Bininj co-researchers and Indigenous rangers, [Kakadu Board of Management](https://www.directory.gov.au/portfolios/environment-and-energy/director-national-parks/kakadu-board-management), [CSIRO](https://www.csiro.au/), [Parks Australia](https://parksaustralia.gov.au/), [Northern Australia National Environment Science Program (NESP)](https://www.nespnorthern.edu.au/), [University of Western Australia (UWA)](https://www.uwa.edu.au/), [Charles Darwin University (CDU)](https://www.cdu.edu.au/) and [Microsoft](https://www.microsoft.com/en-us/ai/ai-for-earth) to support better decision-making to care for significant species and habitats on Indigenous lands.
-
-## Responsible AI, ethical data governance
-The AI which interprets the drone-collected data has been built with the advice and guidance of the Traditional Owners in regard to what is important to them from a land management perspective. 
-That could be information about the presence or absence of animals. It could be information about the condition of different types of grasses or trees. That then feeds into the AI models developed to interpret the data.
-The results and analysis are delivered to rangers via a Power BI dashboard that was designed in partnership with the Traditional Owners based on their cultural values and the season. Rangers can use the dashboard to support their decision making regardless of where they are based.
-The solution has been constructed with several layers of privacy as some of the sites where the drones collect data are sites sacred to the Traditional Owners, and as such, imagery and data from those sites needs to be properly protected.
-The platform features three rings of data management and data governance. The innermost data ring is restricted to Traditional Owners, rangers and Indigenous elders who identify which data can be made available to the second ring.
-The data in the second ring can be accessed by researchers and collaboration partners. The outermost ring is data that can be made available for more public consumption.
-
 
 The Healthy Habitat AI project consists of three models developed using CustomVision.ai and Azure Machine Learning Service, using RGB images, collected by rangers using an off the shelf affordable drone, DJI Mavic PRO 2, from sites in Kakadu National Park, Australia. The models allow rangers to regularly survey large areas that are difficult to access by converting large volumes of data (1000s of high res photos) into metrics that demonstrate how the identified key values are changing following selected management methods. The Healthy Habitat AI project represents an end to end solution to support adaptive management with clearly defined success metrics.
 The models consist of -
@@ -25,6 +16,14 @@ Azure Machine Learning Service:
 
 
 ![](app/HealthyHabitat/Images/Architecture.png)
+
+## Responsible AI, ethical data governance
+The AI which interprets the drone-collected data has been built with the advice and guidance of the Traditional Owners in regard to what is important to them from a land management perspective. 
+That could be information about the presence or absence of animals. It could be information about the condition of different types of grasses or trees. That then feeds into the AI models developed to interpret the data.
+The results and analysis are delivered to rangers via a Power BI dashboard that was designed in partnership with the Traditional Owners based on their cultural values and the season. Rangers can use the dashboard to support their decision making regardless of where they are based.
+The solution has been constructed with several layers of privacy as some of the sites where the drones collect data are sites sacred to the Traditional Owners, and as such, imagery and data from those sites needs to be properly protected.
+The platform features three rings of data management and data governance. The innermost data ring is restricted to Traditional Owners, rangers and Indigenous elders who identify which data can be made available to the second ring.
+The data in the second ring can be accessed by researchers and collaboration partners. The outermost ring is data that can be made available for more public consumption.
 
 # Data Preparation
 
