@@ -1,8 +1,14 @@
+[CmdletBinding()]
+
 Param(
+    [string]
     $Location = 'australiaeast',
+
+    [ValidateLength(2,8)]
+    [string]
     $ProjectName = 'hcai',
-    $ResourceGroupName = $('{0}-{1}' -f $ProjectName, 'rg'),
-    $DeploymentName = $('{0}-{1}' -f $ProjectName, $(Get-Date -Format yyyyMMddhhmmss)),
+
+    [string[]]
     $ContainerNames = @('cannonhill-bangkerreng', 'cannonhill-kunumeleng', 'cannonhil-wurrkeng', 'jabirudreaming-bangkerreng', 'jabirudreaming-kunumeleng', 'jabirudreaming-wurrkeng', 'ubir-bangkerreng', 'ubir-kunumeleng', 'ubir-wurrkeng')
 )
 
@@ -35,23 +41,25 @@ function Invoke-SqlScript {
     }
 }
 
+# get client IP to set Azure SQL DB firewall access rule
+$clientIP = (Invoke-WebRequest -Uri 'http://whatismyip.akamai.com' -ErrorAction Stop).Content
+$resourceGroupName = $('{0}-{1}' -f $ProjectName.ToLower(), 'rg')
+
 # create resource group
 New-AzDeployment `
-    -Name $deploymentName `
+    -Name $('{0}-{1}' -f 'resourceGroup', (Get-Date).ToString('yyyyMMddhhmmss')) `
     -Location $location `
     -TemplateFile $PSScriptRoot/../arm/resourcegroup.json `
-    -ResourceGroupName $ResourceGroupName `
+    -ResourceGroupName $resourceGroupName `
     -ResourceGroupLocation $location
-
-# get client IP to set Azure SQL DB firewall access rulle
-$clientIP = (Invoke-WebRequest -Uri 'http://whatismyip.akamai.com' -ErrorAction Stop).Content
 
 # create resources
 $resourceDeploymentResult = New-AzResourceGroupDeployment `
-    -Name $deploymentName `
-    -ResourceGroupName $ResourceGroupName `
+    -Name $('{0}-{1}' -f 'resources', (Get-Date).ToString('yyyyMMddhhmmss')) `
+    -ResourceGroupName $resourceGroupName `
     -Mode Incremental `
     -TemplateFile $PSScriptRoot/../arm/azuredeploy.json `
+    -prefix $($ProjectName.ToLower() -replace '-', '') `
     -containerNames $containerNames `
     -sqlServerFWClientIpStart $clientIP `
     -sqlServerFWClientIpEnd $clientIP `
@@ -64,7 +72,8 @@ if ($null -ne $resourceDeploymentResult) {
     $sqlServerAdminPassword = $resourceDeploymentResult.Outputs.sqlServerAdminLoginPassword.Value
     $functionAppName = $resourceDeploymentResult.Outputs.functionAppName.Value
     $storageAccountName = $resourceDeploymentResult.Outputs.storageAccountName.Value
-} else {
+}
+else {
     throw "`$resourceDeploymentResult is null"
 }
 
@@ -82,8 +91,8 @@ func azure functionapp publish $functionAppName --python --force
 
 # create eventGrid subscriptions
 New-AzResourceGroupDeployment `
-    -Name $deploymentName `
-    -ResourceGroupName $ResourceGroupName `
+    -Name $('{0}-{1}' -f 'eventGrid', (Get-Date).ToString('yyyyMMddhhmmss')) `
+    -ResourceGroupName $resourceGroupName `
     -Mode Incremental `
     -TemplateFile $PSScriptRoot/../arm/eventgrid.json `
     -ContainerNames $containerNames `
