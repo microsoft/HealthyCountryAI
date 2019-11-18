@@ -4,20 +4,37 @@ Param(
     [string]
     $Location = 'australiaeast',
 
-    [ValidateLength(2,8)]
+    [ValidateLength(2, 8)]
     [string]
     $ProjectName = 'hcai',
+
+    [Parameter(Mandatory=$true)]
+    [string]
+    $SshPublicKey,
 
     [string[]]
     $ContainerNames = @('cannonhill-bangkerreng', 'cannonhill-kunumeleng', 'cannonhil-wurrkeng', 'jabirudreaming-bangkerreng', 'jabirudreaming-kunumeleng', 'jabirudreaming-wurrkeng', 'ubir-bangkerreng', 'ubir-kunumeleng', 'ubir-wurrkeng')
 )
 
+#Requires -Modules Az.Resources
+# NOTE:Install Azure Functions Core Tools 2.0, https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local#v2
+
+if ($null -eq (Get-AzContext).Subscription.Id) {
+    throw "Please select an Azure subscription..."
+}
+
 function Invoke-SqlScript {
     Param(
+        [string]
         $ScriptPath,
+
+        [string]
         $SqlServerName,
+
+        [string]
         $SqlDatabaseName,
-        $SqlServerAdminLoginName,
+        
+        [string]
         $SqlServerAdminPassword
     )
 
@@ -63,6 +80,7 @@ $resourceDeploymentResult = New-AzResourceGroupDeployment `
     -containerNames $containerNames `
     -sqlServerFWClientIpStart $clientIP `
     -sqlServerFWClientIpEnd $clientIP `
+    -adminPublicKey $SshPublicKey `
     -DeploymentDebugLogLevel All
 
 if ($null -ne $resourceDeploymentResult) {
