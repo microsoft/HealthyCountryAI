@@ -96,6 +96,13 @@ For the habitat model subject matter experts (researchers with deep knowledge of
 * Darter (<15 labels)
 * kite (<15 labels)
 
+# Machine Learning Service models
+Two options are provided:
+* A fastai Jupyter notebook, and
+* An ML Pipeline implementing https://github.com/qubvel/segmentation_models
+
+Bot the fastai Jupyter notebook and the ML Pipeline using data prepare with the Data Preparation notebook, using [Labelbox](https://labelbox.com).
+
 ### Machine Learning Workstation
 * Install [Azure Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/)
 * Install [Power BI Desktop](https://powerbi.microsoft.com/en-us/desktop/)
