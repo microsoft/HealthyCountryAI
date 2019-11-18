@@ -13,9 +13,7 @@ CustomVision.ai:
 Azure Machine Learning Service:
 * Para grass - Semantic Segmentation (U-Net)
 
-
-
-![](app/HealthyHabitat/Images/Architecture.png)
+![](Architecture.jpg)
 
 ## Responsible AI, ethical data governance
 The AI which interprets the drone-collected data has been built with the advice and guidance of the Traditional Owners in regard to what is important to them from a land management perspective. 
