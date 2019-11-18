@@ -70,8 +70,7 @@ The function then uses the available models in customvision.ai to score each til
 # AI/ML models
 Here we have implemented three models, classification, object detection (using customvision.ai) and semantic segmentation (Azure Machine Learning Services).
 
-
-# customvision.ai models
+# CustomVision.ai models
 
 ### Habitat
 For the habitat model, we scored the dominant habitat type for each tile by season and site. We greatly reduced the complexity of the labelling task by limiting the labels to broad habitat types, with more detail provided for our target species, para grass, including a “dead para grass” label which directly relates to the management goals of the rangers and Traditional Owners. We chose to label 8 broad habitat categories;
@@ -97,8 +96,6 @@ For the habitat model subject matter experts (researchers with deep knowledge of
 * Darter (<15 labels)
 * kite (<15 labels)
 
-
-
 ### Machine Learning Workstation
 * Install [Azure Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/)
 * Install [Power BI Desktop](https://powerbi.microsoft.com/en-us/desktop/)
@@ -117,8 +114,6 @@ ipython kernel install --user
 ### Field  Local Workstation
 * Install [Azure Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/)
 * Install [Power BI Desktop](https://powerbi.microsoft.com/en-us/desktop/)
-
-
 
 # Contributing
 This project welcomes contributions and suggestions. Most contributions require you to agree to a Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us the rights to use your contribution. For details, visit [cla.microsoft.com](https://cla.opensource.microsoft.com/).
