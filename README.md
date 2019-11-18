@@ -98,10 +98,10 @@ For the habitat model subject matter experts (researchers with deep knowledge of
 
 # Machine Learning Service models
 Two options are provided:
-* A fastai Jupyter notebook, and
+* A [fastai Jupyter notebook](./notebooks/ubir-wurrkeng-fastai.ipynb), and
 * An [ML Pipeline](./notebooks/qubvel-segmentation_models-U-Net-ML-Pipeline.ipynb), implementing https://github.com/qubvel/segmentation_models
 
-Bot the [fastai Jupyter notebook](./notebooks/ubir-wurrkeng-fastai.ipynb) and the ML Pipeline using data prepare with the Data Preparation notebook, using [Labelbox](https://labelbox.com).
+Both the fast.ai Jupyter notebook and the ML Pipeline use data prepared with the Data Preparation notebook and [Labelbox](https://labelbox.com).
 
 ### Machine Learning Workstation
 * Install [Azure Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/)
