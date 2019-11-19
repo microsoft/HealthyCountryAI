@@ -96,6 +96,38 @@ For the habitat model subject matter experts (researchers with deep knowledge of
 * Darter (<15 labels)
 * kite (<15 labels)
 
+###  How to Label Data
+
+Semantic segmentation requires categories to be outlined using polygons for each category visbile in a image.  For this project we trialled two labelling tools, VOTT and LabelBox. 
+
+# VOTT user experience.
+In VOTT a connection to the images to be labelled can be done locally through creating a connection to files stored on a local computer or through a cloud connection to online storage. 
+
+In this project we linked to Azure blob storage containers which required a SAS token to be generated to allow VOTT to read the files.  
+
+The labelling experience in VOTT is not well suited to this project where there are complex overlapping features and categories are not distinct.  For it is straight forward to label fixed infrastructures such as buildings, cars and sigsn but in natural systems there are gradual changes between habitat types and significant heterogeneity within categories and across seasons.  For example, where para grass (label 1) is a continuous ground layer with trees and shrubs (category 2) irregularly situated across the image and other grass (category 3) and water (category 4) also visible.  VOTT does not allow overlapping regions meaning that smaller sections need to be labelled and joined with basic vector tools (vertices or rectangular polygons).  If there are any overlapping regions the labels cannot be saved, and the entire label needs to be removed.  VOTT will not allow any progression until all the regions are tagged which is very difficult to achieve in this use case.  This method requires a substantial number of labels for each category, so the labelling experience and tools are very important to support rapid and accurate labelling.  Due to the limitations for this use case listed above we did not use this tool for labelling. 
+
+VOTT interface showing overlapping labels that will cause an error.  
+
+![](app/HealthyHabitat/Images/VOTT.png)
+
+
+# LabelBox labelling experience. 
+LabelBox is linked directly to the Azure Blob storage containers.  
+
+Labelling requires the labeller to mark the different habitat types by selecting the appropriate habitat category then tracing around discrete habitat features using the mouse.  You can either hold down the left button and trace around the habitat using a drawing feature.  Or continue to click and add new vertices if that is easier.  This tooling provides a more intuitive user experience allowing the user to chose coarse or fine methods depending on the feature that is being labelled.   
+
+It is still difficult to categorise complex habitat features that are of a more continuous nature rather than discrete habitat types.  Some habitat types include examples of many different categories, so the user needs to make a choice as to what the dominant feature is, understanding that the visual appearance of this feature not be distinct.  There are also many small habitat features, such as waterholes surround by other features, that are time consuming to mask.  The labelling experience is easiest when there are distinct separated features such as open water, bare ground or a dense monoculture of para grass.  When there are largely homogenous separated habitat types the quickest way to label the image is to label the less dominant categories using the polygon tool and then use the paint tool to label the remaining parts of the image.  This ensures that there aren’t any edges left unlabelled.  It is important to ensure that the barriers between habitat categories are closed otherwise the paint tool will fill the edges with the selected category.  
+
+A useful feature in LabelBox is that the user can zoom in to an area and partially enclose a particular category and then add to the polygon by using overlapping polygons. This allows more detailed labelling to occur.   Using this method it is also possible to enclose the edges of a category, label other categories within the enclosed area and then use the fill tool to easily label the dominant category.  
+
+Example of LabelBox with overlapping habitat types and the remaining category (water) can be easily labelled with the fill tool (paint drop icon). 
+
+![](app/HealthyHabitat/Images/labelBox.png)
+
+The main challenge using this labelling technique is deciding how many categories to label.  To develop and effective and accurate model, each category requires many labels.  Therefore, if you try to be too specific with the categories (e.g 10 categories to describe the different growth states of para grass) you will multiply the number of labels required by the number of categories you derived (e.g if you are aiming for 2000 labels for each category, 5 categories will require 10000 labels and if you shift up to 20 categories you will require 40000 labels – which requires a significant commitment.  Conversely, if you select more general and inclusive labels (e.g all grasses) then you will require less labels but your model will not be very specific.  
+
+
 # Machine Learning Service models
 Two options are provided:
 * A [fastai Jupyter notebook](./notebooks/ubir-wurrkeng-fastai.ipynb), and
