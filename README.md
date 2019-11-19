@@ -68,7 +68,7 @@ Firstly it resizes the high resolution images (5472x3648) and saves a smaller (1
 The function then uses the available models in customvision.ai to score each tile for dominant habitat type (classification) and animal (object detection). The scores are written out to an SQL database with associated covariates that allow subsequent filtering and analytics in Power BI. In this system a link to a SAS URL for each image is written to the database to provide a direct link back to the photographs using survey date as the key.
 
 # AI/ML models
-Here we have implemented three models, classification, object detection (using customvision.ai) and semantic segmentation (Azure Machine Learning Services).
+Here we have implemented three models, classification, object detection (using customvision.ai) and semantic segmentation (Azure Machine Learning Services).  This approach requires users to train models by identifying objects in the photos through labelling features of interest. It is important to note that there is no fixed number of labels required to train the models.  In this project we found that once 2000 images were labelled the accuracy of the models (the ability of the model to accuractely predict habitat type and animals) greatly increased and the labelling task become faster and easier.  In customvision.ai once you have completed the initial labelling task the models are trained allowing predictions to be displayed on the untagged images.  The user can then confirm or reject the predicted label and add any missed features.   
 
 # CustomVision.ai models
 
@@ -123,7 +123,7 @@ Example of LabelBox with overlapping habitat types and the remaining category (w
 
 ![](app/HealthyHabitat/Images/labelBox.PNG)
 
-The main challenge using this labelling technique is deciding how many categories to label.  To develop and effective and accurate model, each category requires many labels.  Therefore, if you try to be too specific with the categories (e.g 10 categories to describe the different growth states of para grass) you will multiply the number of labels required by the number of categories you derived (e.g if you are aiming for 2000 labels for each category, 5 categories will require 10000 labels and if you shift up to 20 categories you will require 40000 labels – which requires a significant commitment.  Conversely, if you select more general and inclusive labels (e.g all grasses) then you will require less labels but your model will not be very specific.  
+The main challenge using this labelling technique is deciding how many categories to label.  To develop and effective and accurate model, each category requires many labels.  Therefore, if you try to be too specific with the categories (e.g 10 categories to describe the different growth states of para grass) you will multiply the number of labels required by the number of categories you derived (e.g if you are aiming for 2000 labels for each category, 5 categories will require 10000 labels and if you shift up to 20 categories you will require 40000 labels – which requires a significant commitment).  Conversely, if you select more general and inclusive labels (e.g all grasses) then you will require less labels but your model will not be very specific.  
 
 
 # Machine Learning Service models
