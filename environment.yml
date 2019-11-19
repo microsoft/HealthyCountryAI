@@ -9,7 +9,9 @@ dependencies:
   - shapely
   - pip:
     - albumentations
-    - azureml-sdk[notebooks,automl]
+    - azureml-contrib-pipeline-steps
+    - azureml-pipeline-core
+    - azureml-sdk[notebooks]
     - azure-cognitiveservices-vision-customvision
     - azure-storage
     - azure-functions
