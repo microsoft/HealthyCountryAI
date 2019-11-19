@@ -96,11 +96,11 @@ For the habitat model subject matter experts (researchers with deep knowledge of
 * Darter (<15 labels)
 * kite (<15 labels)
 
-###  How to Label Data
+#  How to Label Data
 
 Semantic segmentation requires categories to be outlined using polygons for each category visbile in a image.  For this project we trialled two labelling tools, VOTT and LabelBox. 
 
-# VOTT user experience.
+### VOTT user experience.
 In VOTT a connection to the images to be labelled can be done locally through creating a connection to files stored on a local computer or through a cloud connection to online storage. 
 
 In this project we linked to Azure blob storage containers which required a SAS token to be generated to allow VOTT to read the files.  
@@ -109,10 +109,10 @@ The labelling experience in VOTT is not well suited to this project where there 
 
 VOTT interface showing overlapping labels that will cause an error.  
 
-![](app/HealthyHabitat/Images/VOTT.png)
+![](HealthyCountryAI/blob/master/app/HealthyHabitat/Images/VOTT.PNG)
 
 
-# LabelBox labelling experience. 
+### LabelBox labelling experience. 
 LabelBox is linked directly to the Azure Blob storage containers.  
 
 Labelling requires the labeller to mark the different habitat types by selecting the appropriate habitat category then tracing around discrete habitat features using the mouse.  You can either hold down the left button and trace around the habitat using a drawing feature.  Or continue to click and add new vertices if that is easier.  This tooling provides a more intuitive user experience allowing the user to chose coarse or fine methods depending on the feature that is being labelled.   
@@ -123,7 +123,7 @@ A useful feature in LabelBox is that the user can zoom in to an area and partial
 
 Example of LabelBox with overlapping habitat types and the remaining category (water) can be easily labelled with the fill tool (paint drop icon). 
 
-![](app/HealthyHabitat/Images/labelBox.png)
+![](HealthyCountryAI/blob/master/app/HealthyHabitat/Images/labelBox.PNG)
 
 The main challenge using this labelling technique is deciding how many categories to label.  To develop and effective and accurate model, each category requires many labels.  Therefore, if you try to be too specific with the categories (e.g 10 categories to describe the different growth states of para grass) you will multiply the number of labels required by the number of categories you derived (e.g if you are aiming for 2000 labels for each category, 5 categories will require 10000 labels and if you shift up to 20 categories you will require 40000 labels – which requires a significant commitment.  Conversely, if you select more general and inclusive labels (e.g all grasses) then you will require less labels but your model will not be very specific.  
 
