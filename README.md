@@ -109,7 +109,7 @@ The labelling experience in VOTT is not well suited to this project where there 
 
 VOTT interface showing overlapping labels that will cause an error.  
 
-![](app/HealthyHabitat/Images/VOTT.png)
+![](app/HealthyCountryAI/blob/master/app/HealthyHabitat/Images/VOTT.png)
 
 
 # LabelBox labelling experience. 
@@ -123,7 +123,7 @@ A useful feature in LabelBox is that the user can zoom in to an area and partial
 
 Example of LabelBox with overlapping habitat types and the remaining category (water) can be easily labelled with the fill tool (paint drop icon). 
 
-![](app/HealthyHabitat/Images/labelBox.png)
+![](app/HealthyHabitatAI/blob/master/app/HealthyHabitat/Images/labelBox.png)
 
 The main challenge using this labelling technique is deciding how many categories to label.  To develop and effective and accurate model, each category requires many labels.  Therefore, if you try to be too specific with the categories (e.g 10 categories to describe the different growth states of para grass) you will multiply the number of labels required by the number of categories you derived (e.g if you are aiming for 2000 labels for each category, 5 categories will require 10000 labels and if you shift up to 20 categories you will require 40000 labels – which requires a significant commitment.  Conversely, if you select more general and inclusive labels (e.g all grasses) then you will require less labels but your model will not be very specific.  
 
