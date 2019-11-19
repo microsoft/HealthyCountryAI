@@ -148,6 +148,10 @@ conda install notebook ipykernel
 ipython kernel install --user
 ```
 
+# Data visualisation and interaction
+The scored data is stored in an SQL database which is linked to a power BI report.  The SQL server contains links to the resized photographs and for each photograph the scored results of the customvision.ai models (% of each habitat type and count of each animal).  
+
+
 ### Field  Local Workstation
 * Install [Azure Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/)
 * Install [Power BI Desktop](https://powerbi.microsoft.com/en-us/desktop/)
