@@ -164,5 +164,9 @@ When you submit a pull request, a CLA-bot will automatically determine whether y
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
+For more details or help deploying, contact:
+[Dr Justin Perry]( Justin.perry@csiro.au), CSIRO, or
+[Steve van Bodegraven](Steve.VanBodegraven@microsoft.com), Microsoft
+
 # License
 This repository is licensed with the [MIT license](https://github.com/Microsoft/dotnet/blob/master/LICENSE).
