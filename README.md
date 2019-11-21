@@ -1,50 +1,43 @@
  ## Healthy Country AI
 
 ### Overview
-The Healthy Country AI project in Kakadu NP is a collaboration between Bininj co-researchers and Indigenous rangers, [Kakadu Board of Management](https://www.directory.gov.au/portfolios/environment-and-energy/director-national-parks/kakadu-board-management), [CSIRO](https://www.csiro.au/), [Parks Australia](https://parksaustralia.gov.au/), [Northern Australia National Environment Science Program (NESP)](https://www.nespnorthern.edu.au/), [University of Western Australia (UWA)](https://www.uwa.edu.au/), [Charles Darwin University (CDU)](https://www.cdu.edu.au/) and [Microsoft](https://www.microsoft.com/en-us/ai/ai-for-earth) to support better decision-making to care for significant species and habitats on Indigenous lands.
+The Healthy Country AI project in Kakadu National Park is a collaboration between Bininj co-researchers and Indigenous rangers, the [Kakadu Board of Management](https://www.directory.gov.au/portfolios/environment-and-energy/director-national-parks/kakadu-board-management), [CSIRO](https://www.csiro.au/), [Parks Australia](https://parksaustralia.gov.au/), [Northern Australia National Environment Science Program (NESP)](https://www.nespnorthern.edu.au/), the [University of Western Australia (UWA)](https://www.uwa.edu.au/), [Charles Darwin University (CDU)](https://www.cdu.edu.au/) and [Microsoft](https://www.microsoft.com/en-us/ai/ai-for-earth) to support better decision-making to care for significant species and habitats on Indigenous lands.
 
-The Healthy Country AI project consists of three models developed using CustomVision.ai and Azure Machine Learning Service, using RGB images, collected by rangers using an off the shelf affordable drone, DJI Mavic Pro 2, from sites in Kakadu National Park, Australia. The models allow rangers to regularly survey large areas that are difficult to access by converting large volumes of data (1000s of high res photos) into metrics that demonstrate how the identified key values are changing following selected management methods. The Healthy Country AI project represents an end to end solution to support adaptive management with clearly defined success metrics.
-The models consist of -
+The Healthy Country AI project consists of three models developed using [Custom Vision](http://customvision.ai) and [Azure Machine Learning Service](https://azure.microsoft.com/en-us/services/machine-learning/).  The models operate on RGB images collected by rangers using an off-the-shelf affordable drone (DJI Mavic Pro 2) from sites in Kakadu National Park, Australia. The models allow rangers to regularly survey large areas that are difficult to access by converting large volumes of data (thousands of high-resolution photos) into metrics that demonstrate how the key metrics of ecosystem health are changing following management interventions. The Healthy Country AI project represents an end-to-end solution to support adaptive management with clearly defined success metrics.
 
-CustomVision.ai:
-* Para grass - Classification (304 x 228 px Tiles)
-* Magpie Geese - Object Detection (304 x 228 px Tiles)
+The three models are:
 
-Azure Machine Learning Service:
-* Para grass - Semantic Segmentation (U-Net)
+* Para grass (classification, 304 &times; 228 tiles) (Custom Vision)
+* Magpie Geese (object detection, 304 &times; 228 tiles) (Custom Vision)
+* Para grass (semantic segmentation) (Azure Machine Learning Service)
 
 ![](Architecture.jpg)
 
-## Responsible AI, ethical data governance
+## Responsible AI and ethical data governance
+
 The AI which interprets the drone-collected data has been built with the advice and guidance of the Traditional Owners in regard to what is important to them from a land management perspective. 
-That could be information about the presence or absence of animals. It could be information about the condition of different types of grasses or trees. That then feeds into the AI models developed to interpret the data.
-The results and analysis are delivered to rangers via a Power BI dashboard that was designed in partnership with the Traditional Owners based on their cultural values and the season. Rangers can use the dashboard to support their decision making regardless of where they are based.
-The solution has been constructed with several layers of privacy as some of the sites where the drones collect data are sites sacred to the Traditional Owners, and as such, imagery and data from those sites needs to be properly protected.
-The platform features three rings of data management and data governance. The innermost data ring is restricted to Traditional Owners, rangers and Indigenous elders who identify which data can be made available to the second ring.
-The data in the second ring can be accessed by researchers and collaboration partners. The outermost ring is data that can be made available to the public.
+That could be, for example, information about the presence or absence of animals, or information about the condition of different types of grasses and trees. 
 
-# Data Preparation
+The results and analysis are delivered to rangers via a Power BI dashboard that was designed in partnership with the Traditional Owners. Rangers can use the dashboard to support their decision making regardless of where they are based.
 
-The rangers and traditional owners, Bininj, selected several sites based on important environmental and cultural values. At each of these sites, a fixed set of transects are programmed into the drone to cover the same area of interest at the same height (60m above from point of take off) each time the area is flown. The drone flys at a set speed and sets capture rate for photos to get a 60% overlap in photos to allow photogrammetric analysis. The three areas are flat flood plains so the height remains constant above the survey area. Once the transects are flown the rangers return to home base where they have internet and computers. The Micro-SD card is removed from the drone and inserted into the rangers pc.
+The solution has been constructed with several layers of privacy, as some of the sites where the drones collect data are sacred to the Traditional Owners, and as such, imagery and data from those sites needs to be properly protected.
 
-Rangers seperate the photos into folders for each site and if multiple surveys have been flown at a site into site/date folders. An application (https://github.com/microsoft/HealthyCountryAI/tree/master/app/Release) is installed on the rangers pc or field laptop, opened through a short cut executable on the desktop. This application depicts the six seasons defined by environmental indicators that mark changes to the season. Rangers select the files from the site folders they created and drag the files into the season that Bininj Traditional Owners use to monitor and manage this area on the app. The app prompts the ranger to select a site from a list and then prompts to select the type of photographs, animal or habitat. Once the site and type are selected the app automatically synchronizes the data to Azure Storage and creates a standardised file structure for each site, site-season-type-datetime.
+The platform features three rings of data management and data governance:
+
+* The innermost data ring is restricted to Traditional Owners, rangers, and Indigenous elders who identify which data can be made available to the second ring.
+* The data in the second ring can be accessed by researchers and collaboration partners.
+* The outermost ring is data that can be made available to the public.
+
+
+# Data preparation
+
+The rangers and Traditional Owners, Bininj, selected several sites based on important environmental and cultural values. At each of these sites, a fixed set of transects are programmed into the drone to cover the same area of interest at the same height (60m above the point of take-off) each time the area is flown. The drone flies at a set speed and sets its capture rate to get a 60% overlap between photos, to allow photogrammetric analysis. The three areas are flat flood plains, so the height remains constant above the survey area. Once the transects are flown, the rangers return to home base where they have Internet access. The Micro-SD card is removed from the drone and inserted into the ranger's PC.
+
+Rangers separate the photos into folders for each site and each survey. An [https://github.com/microsoft/HealthyCountryAI/tree/master/app/Release](application) is installed on the ranger's PC; this application depicts the six seasons defined by environmental indicators. Rangers select the files from the site folders they created and drag the files into the season that Bininj Traditional Owners use to monitor and manage this area. The app prompts the ranger to select a site from a list and then prompts the user to select the type of photographs (animal or habitat). Once the site and type are selected, the app automatically synchronizes the data to Azure Storage and creates a standardised file structure for each site (site-season-type-datetime).
 
 ![](app/HealthyHabitat/Images/SeasonalWheel.png)
 
-One storage account is used and sub folders are created to differentiate the different sites, seasons, survey times, model types. Files are stored as blobs. For example;
-Storage
-* healthyhabitatai
-Site-season
-* ubir-wurrkeng
-Model type
-* animal
-* datetime (of survey)
-* files
-* habitat
-* datetime of survey
-* files
-
-Data is automatically divided into containers named using the combination of *site* and *season* matching the section of the seasonal wheel images were dragged onto, for example -
+One storage account is used and subfolders are created to differentiate among sites, seasons, survey times, and model types. Files are stored as blobs. Data is automatically divided into containers named using the combination of *site* and *season*, matching the section of the seasonal wheel images were dragged onto, for example:
 
 * cannon-hill-kunumeleng
 * cannon-hill-wurrkeng
@@ -53,60 +46,64 @@ Data is automatically divided into containers named using the combination of *si
 * ubir-kunumeleng
 * ubir-wurrkeng
 
-Then by the YYY-MM-DD-HHMM the collection occured, for example -
+...then by the YYY-MM-DD-HHMM the collection occurred, for example:
+
 * 2019-04-03-1050
 
-Two functions are triggered by the successful upload of each photo.
+Two functions are triggered by the successful upload of each photo:
 
-Function 1. Split regions
-The first function splits each photograph into 120 tiles and uploads the tiled images to seasonal projects in custom vision.au for labeling. If a project doesn’t exist, a new customvision.ai project is automatically created using the site-season-type combination described above. End users can then open customvision.ai and label animals (object detection) or habitat(classification) to train the model. As more labels are accumulated for each model users should train the model and publish the new results to improve accuracy.
+<i>Function 1: Split regions</i>
 
-Function 2. Score regions.
-The second function has three elements.
-Firstly it resizes the high resolution images (5472x3648) and saves a smaller (1024x768) version of the photo with the same name to support quicker rendering on the powerBI dashboard.
+The first function splits each photograph into 120 tiles and uploads the tiled images to seasonal projects in Custom Vision for labeling. If a project doesn't exist, a new Custom Vision project is automatically created using the site-season-type combination described above. End users can then open Custom Vision and label animals (object detection) or habitat (classification) to train the model.  As more labels are accumulated for each model, users should train the model and publish the new results to improve accuracy.
 
-The function then uses the available models in customvision.ai to score each tile for dominant habitat type (classification) and animal (object detection). The scores are written out to an SQL database with associated covariates that allow subsequent filtering and analytics in Power BI. In this system a link to a SAS URL for each image is written to the database to provide a direct link back to the photographs using survey date as the key.
+<i>Function 2: Score regions</i>
+
+This function first resizes the high-resolution images (5472 &times; 3648) and saves a smaller (1024 &times; 768) version of the photo with the same name to support quicker rendering on the PowerBI dashboard.  The function then uses the available models in Custom Vision to score each tile for dominant habitat type (classification) and animal (object detection). The scores are written out to an SQL database with associated covariates that allow subsequent filtering and analytics in Power BI. In this system a link to a SAS URL for each image is written to the database to provide a direct link back to the photographs using survey date as the key.
 
 # AI/ML models
-Here we have implemented three models, classification, object detection (using customvision.ai) and semantic segmentation (Azure Machine Learning Services).  This approach requires users to train models by identifying objects in the photos through labelling features of interest. It is important to note that there is no fixed number of labels required to train the models.  In this project we found that once 2000 images were labelled the accuracy of the models (the ability of the model to accuractely predict habitat type and animals) greatly increased and the labelling task become faster and easier.  In customvision.ai once you have completed the initial labelling task the models are trained allowing predictions to be displayed on the untagged images.  The user can then confirm or reject the predicted label and add any missed features.   
 
-# CustomVision.ai models
+Here we have implemented three models: classification, object detection (using Custom Vision) and semantic segmentation (using Azure Machine Learning Service).  This approach requires users to train models to identify objects in the photos by labelling features of interest. There is no fixed number of labels required to train the models, but we found that once 2000 images were labelled, the accuracy of the models greatly increased and the labelling task became faster and easier.  In Custom Vision, once you have completed the initial labelling task, the models are trained, allowing predictions to be displayed on the untagged images.  The user can then confirm or reject the predicted label and add any missed features.   
+
+## Custom Vision models
 
 ### Habitat
-For the habitat model, we scored the dominant habitat type for each tile by season and site. We greatly reduced the complexity of the labelling task by limiting the labels to broad habitat types, with more detail provided for our target species, para grass, including a “dead para grass” label which directly relates to the management goals of the rangers and Traditional Owners. We chose to label 8 broad habitat categories;
+
+For the habitat model, we scored the dominant habitat type for each tile by season and site. We greatly reduced the complexity of the labelling task by limiting the labels to broad habitat types, with more detail provided for our target species, para grass, including a "dead para grass" label which directly relates to the management goals of the rangers and Traditional Owners. We chose to label eight broad habitat categories;
 
 * Para grass
 * Water
-* Dense Para-grass
-* Dead Para-grass
+* Dense para-grass
+* Dead para-grass
 * Bare ground
 * Other grass
 * Lily
 * Tree
 
-We use a single tag per image using a classification model. This required subject matter experts, in this case researchers who had a good knowledge of the visual characteristics of para grass compared with other native species from aerial photos. Using this method it was necessary make decisions about which habitat type was dominant, reducing the complexity of the labelling task but also reducing the detail of the results and leading to difficult labelling decisions in tiles that had diverse habait characteristic, e.g equal parts water, bare ground and paragrass.
+We use a single tag per image for our classification model. This required subject matter experts, in this case researchers who had a good knowledge of the visual characteristics of para grass compared with other native species from aerial photos. Using this method, it was necessary make decisions about which habitat type was dominant, reducing the complexity of the labelling task but also reducing the detail of the results and leading to difficult labelling decisions in tiles that had diverse habitat characteristics, e.g equal parts water, bare ground, and paragrass.
 
 ### Animal
-For the habitat model subject matter experts (researchers with deep knowledge of vertebrate species in the region) labeled all vertebrate species that were easily identified in the tiles. The focus species, magpie geese, was easily separated from other species so there was a very high confidence in these labels. Other species, such as egrets and spoon bills, were less distinct (from 60m) and were lumped into one category, egrets, which included all white birds. Several other species had very few individuals (<15 labels) and these were excluded. Labels were dominated by magpie geese and egrets, the remaining species were sparse. Species labels include:
+
+For the animal model, subject matter experts (researchers with deep knowledge of vertebrate species in the region) labelled all vertebrate species that were easily identified in the tiles. The focus species &ndash; magpie geese &ndash; was easily separated from other species, so there was a very high confidence in these labels. Other species, such as egrets and spoon bills, were less distinct (from 60m) and were lumped into one category &ndash; egrets &ndash; which included all white birds. Several other species had very few individuals (<15 labels) and these were excluded. Labels were dominated by magpie geese and egrets; the remaining species were sparse. Species labels include:
 
 * Goose
 * Egret
 * Crocodile
 * Stork
 * Darter (<15 labels)
-* kite (<15 labels)
+* Kite (<15 labels)
 
-#  How to Label Data
 
-Semantic segmentation requires categories to be outlined using polygons for each category visbile in a image.  For this project we trialled two labelling tools, VOTT and LabelBox. 
+# How to label data for segmentation
 
-### VOTT user experience.
-Training data (aerial photographs of the study area) can be accessed locally through creating a connection to files stored on a PC or through a cloud connection to online storage.  
-In this project we created a project linked to Azure blob storage containers requiring a SAS token to be generated.  
+Semantic segmentation requires categories to be outlined using polygons for each category visible in a image.  For this project, we trialled two labelling tools: VoTT and LabelBox. 
 
-The labelling experience in VOTT is not well suited to labelling heterogenous natural systems characterised by complex overlapping features.  This system is better suited to labelling well defined categorical data such as buildings, cars and signs.  In natural systems there are gradual changes between habitat features and significant heterogeneity within categories.  For example, a common labelling experience involved categorising a continous ground layer of dense para grass (label 1) interspersed with trees and shrubs (category 2), other grass (category 3) growing through some areas dominated by para grass(category 4) with small depressions holding water (category 5) and other large sections of open water some of which had varying denisty of emergent vegetation (all lumped into category 5) or predominantly water lily (category 6).  In this context, VOTT does not allow overlapping regions meaning that smaller sections need to be labelled and joined with basic vector tools (vertices or rectangular polygons).  If there are any overlapping regions the labels cannot be saved, and the entire label needs to be removed.  VOTT will not allow any progression until all the regions are tagged which is very difficult to achieve in this use case.  This method requires a substantial number of labels for each category, so the labelling experience and tools are very important to support rapid and accurate labelling.  Due to the limitations for this use case listed above we did not use this tool for labelling. 
+## VoTT user experience
 
-# VOTT interface showing overlapping labels that will cause an error.  
+Training data (aerial photographs of the study area) can be accessed locally by creating a connection to files stored on a PC or through a connection to online storage.
+
+The labelling experience in VOTT is not well-suited to labelling heterogenous natural systems characterised by complex overlapping features; VoTT system is better suited to labelling well-defined categorical data such as buildings, cars and signs.  In natural systems there are gradual changes between habitat features and significant heterogeneity within categories.  For example, a common labelling experience involved categorising a continuous ground layer of dense para grass (label 1) interspersed with trees and shrubs (category 2), other grass (category 3) growing through some areas dominated by para grass(category 4) with small depressions holding water (category 5) and other large sections of open water some of which had varying density of emergent vegetation (all lumped into category 5) or predominantly water lily (category 6).  In this context, VOTT does not allow overlapping regions meaning that smaller sections need to be labelled and joined with basic vector tools (vertices or rectangular polygons).  If there are any overlapping regions the labels cannot be saved, and the entire label needs to be removed.  VOTT will not allow any progression until all the regions are tagged which is very difficult to achieve in this use case.  This method requires a substantial number of labels for each category, so the labelling experience and tools are very important to support rapid and accurate labelling.  Due to the limitations for this use case listed above we did not use this tool for labelling. 
+
+VOTT interface showing overlapping labels that will cause an error.  
 
 ![](app/HealthyHabitat/Images/VOTT.PNG)
 
