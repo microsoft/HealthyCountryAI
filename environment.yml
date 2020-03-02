@@ -1,11 +1,21 @@
 name: HealthyHabitatAI
 dependencies:
+  - keras
   - matplotlib
+  - opencv
   - python=3.6.5
   - Pillow
   - pip
+  - shapely
   - pip:
-    - azureml-sdk[notebooks,automl]
+    - albumentations
+    - azureml-contrib-pipeline-steps
+    - azureml-pipeline-core
+    - azureml-sdk[notebooks]
     - azure-cognitiveservices-vision-customvision
     - azure-storage
     - azure-functions
+    - imgaug
+    - imutil
+    - python-dotenv
+    - segmentation-models

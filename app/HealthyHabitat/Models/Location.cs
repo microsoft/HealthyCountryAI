@@ -1,4 +1,4 @@
-﻿namespace SixSeasons.Models
+﻿namespace HealthyHabitat.Models
 {
     using System;
     using System.Collections.Generic;

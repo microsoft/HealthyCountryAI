@@ -93,6 +93,7 @@
     <Compile Include="CustomFrameworkDialogFactory.cs" />
     <Compile Include="Helpers\AsyncFileCopy.cs" />
     <Compile Include="Helpers\Converters.cs" />
+    <Compile Include="Models\Type.cs" />
     <Compile Include="Models\Location.cs" />
     <Compile Include="ViewModelLocator.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
@@ -146,18 +147,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\SixSeasons.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Cache\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\Ngurrungurrudjba-Yellow-Water-Seasons.png" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="AzCopy\azcopy.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Images\SeasonalWheel.png" />
     <Resource Include="Images\dot.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
