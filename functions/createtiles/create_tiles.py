@@ -12,7 +12,7 @@ blob_account_name = os.getenv("BLOB_ACCOUNT_NAME")
 blob_account_key = os.getenv("BLOB_ACCOUNT_KEY")
 block_blob_service = BlockBlobService(account_name=blob_account_name,
                                       account_key=blob_account_key)
-custom_vision_training_key=os.getenv('CUSTOM_VISION_TRAINING_KEY')
+custom_vision_objdet_training_key=os.getenv('CUSTOM_VISION_TRAINING_KEY')
 ENDPOINT = os.getenv('CUSTOM_VISION_ENDPOINT')
 
 # Get Custom Vision project
@@ -22,12 +22,15 @@ projects = trainer.get_projects()
 # ### Custom Vision
 def load(req_body):
     blob_obj,filename, container_name = extract_blob_props(req_body[0]['data']['url']  )
-    id = [project.id for project in projects if project.name == container_name][0]
-    if id:
-        image = Image.open(io.BytesIO(blob_obj.content))
-        result = load_blob(image,filename, id)
-    else:
-        logging.error('Unable to find project matching Storage Container name: {0}'.format(container_name))  
+    # check if project exists matching storage container name
+    for x in ['animals', 'paragrass']:
+        id = [project.id for project in projects if project.name == container_name+'-'+x]
+        if id:
+            image = Image.open(io.BytesIO(blob_obj.content))
+            result = load_blob(image,filename, id[0])
+        else:
+            logging.error('Unable to find project matching storage container name: {0}'.format(container_name+'-'+x))
+            result = "Failure"
     return result
 
 # Extract blob container name and blob file
@@ -58,4 +61,4 @@ def load_blob(image_obj, blob_file_name, project_id):
                 for image_create_result in result.images:
                     print("Image status: ", image_create_result.status)
             count += 1
-    return "Success"
+    return("Success")
