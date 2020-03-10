@@ -39,14 +39,14 @@ Rangers separate the photos into folders for each site and each survey. An [http
 
 One storage account is used and subfolders are created to differentiate among sites, seasons, survey times, and model types. Files are stored as blobs. Data is automatically divided into containers named using the combination of *site* and *season*, matching the section of the seasonal wheel images were dragged onto, for example:
 
-* cannon-hill-kunumeleng
-* cannon-hill-wurrkeng
+* cannonhill-kunumeleng
+* cannonhill-wurrkeng
 * jabiru-dreaming-kunumeleng
 * jabiru-dreaming-wurrkeng
 * ubir-kunumeleng
 * ubir-wurrkeng
 
-...then by the YYY-MM-DD-HHMM the collection occurred, for example:
+...then by the YYYY-MM-DD-HHMM the collection occurred, for example:
 
 * 2019-04-03-1050
 
