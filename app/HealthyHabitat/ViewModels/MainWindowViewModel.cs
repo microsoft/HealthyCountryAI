@@ -41,12 +41,6 @@
             private set;
         }
 
-        public RelayCommand NextClickCommand
-        {
-            get;
-            private set;
-        }
-
         public RelayCommand UploadClickCommand
         {
             get;
@@ -63,18 +57,9 @@
 
         public ObservableCollection<Location> Locations { get; set; }
 
-        public ObservableCollection<Models.Type> Types { get; set; }
-
         public Location SelectedLocation { get; set; }
 
         public string SelectedSeason { get; set; }
-
-        public Models.Type SelectedType { get; set; }
-
-        public string ProgressText
-        {
-            get { return string.Format("{0} %", _progressValue); }
-        }
 
         private double _progressValue;
         public double ProgressValue
@@ -84,7 +69,6 @@
             {
                 _progressValue = value;
                 RaisePropertyChanged("ProgressValue");
-                RaisePropertyChanged("ProgressText");
             }
         }
 
@@ -99,17 +83,6 @@
             }
         }
 
-        private bool _progressVisible;
-        public bool ProgressVisible
-        {
-            get { return _progressVisible; }
-            set
-            {
-                _progressVisible = value;
-                RaisePropertyChanged("ProgressVisible");
-            }
-        }
-
         private bool _locationDialogVisible;
         public bool LocationDialogVisible
         {
@@ -121,35 +94,15 @@
             }
         }
 
-        private bool _typeDialogVisible;
-        public bool TypeDialogVisible
-        {
-            get { return _typeDialogVisible; }
-            set
-            {
-                _typeDialogVisible = value;
-                RaisePropertyChanged("TypeDialogVisible");
-            }
-        }
-
         public MainWindowViewModel(IDialogService dialogService)
         {
-            NameValueCollection locationSection = (NameValueCollection)ConfigurationManager.GetSection("locations");
+            var locationSection = (NameValueCollection)ConfigurationManager.GetSection("locations");
 
             Locations = new ObservableCollection<Location>();
 
             foreach (var location in locationSection.AllKeys)
             {
                 Locations.Add(new Location() { Id = location, Name = locationSection[location] });
-            }
-
-            NameValueCollection typeSection = (NameValueCollection)ConfigurationManager.GetSection("types");
-
-            Types = new ObservableCollection<Models.Type>();
-
-            foreach (var type in typeSection.AllKeys)
-            {
-                Types.Add(new Models.Type() { Id = type, Name = typeSection[type] });
             }
 
             this.dialogService = dialogService;
@@ -171,24 +124,15 @@
                 System.Windows.Application.Current.Shutdown();
             });
 
-            NextClickCommand = new RelayCommand(() =>
+            UploadClickCommand = new RelayCommand(() =>
             {
                 LocationDialogVisible = false;
 
-                TypeDialogVisible = true;
-            });
-
-            UploadClickCommand = new RelayCommand(() =>
-            {
-                TypeDialogVisible = false;
-
-                //ProgressVisible = true;
-
-                CopyFilesToLocalCache(this.Files.ToArray<string>(), this.SelectedType.Id);
+                CopyFilesToLocalCache(this.Files.ToArray<string>());
             });
         }
 
-        private async void CopyFilesToLocalCache(string[] files, string type)
+        private async void CopyFilesToLocalCache(string[] files)
         {
             string cacheLocation = System.IO.Path.Combine(ConfigurationManager.AppSettings["localCache"].ToString() ?? AppDomain.CurrentDomain.BaseDirectory, Guid.NewGuid().ToString());
 
@@ -224,7 +168,7 @@
                     lastModifiedDateTime = lastWriteTime.ToString("yyyy'-'MM'-'dd'-'HH") + "00";
                 }
 
-                string destination = Path.Combine(cacheLocation, type, lastModifiedDateTime);
+                string destination = Path.Combine(cacheLocation, lastModifiedDateTime);
 
                 Directory.CreateDirectory(destination);
 
@@ -237,17 +181,17 @@
 
             ProgressValueMax = size;
 
-            await AsyncFileCopy.CopyFiles(fileCopyManifest, prog => ProgressValue = prog);
+            await AsyncFileCopy.CopyFiles(fileCopyManifest, progress => ProgressValue = progress);
 
             string[] subFolders = Directory.GetDirectories(cacheLocation);
 
             foreach (string folder in subFolders)
             {
-                await RunAzCopy(folder, cacheLocation);
+                RunAzCopy(folder, cacheLocation);
             }
         }
 
-        private async Task RunAzCopy(string sourceDirectory, string parentDirectory)
+        private void RunAzCopy(string sourceDirectory, string parentDirectory)
         {
             var command = new StringBuilder("/C azcopy cp \"[sourceDirectory]\" \"[sasUri]\" --recursive=true --put-md5 & rmdir /q/s \"[parentDirectory]\"");
 
