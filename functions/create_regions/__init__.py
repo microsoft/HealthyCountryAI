@@ -1,10 +1,13 @@
-import io, json, logging, os
+import datetime, imageio, io, json, logging, os, sys
 import azure.functions as func
 import numpy as np
 from . import azure_storage
 from . import common
 from . import custom_vision
 from PIL import Image
+
+from azure.cognitiveservices.vision.customvision.training import CustomVisionTrainingClient
+from azure.cognitiveservices.vision.customvision.training.models import ImageFileCreateEntry
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     '''
@@ -31,30 +34,44 @@ def create_regions_from_blob(body):
     url = body[0]['data']['url']
     logging.info(url)
 
-    container_name = url.split('/', 4)[-2]
+    parts = url.split('/')
+
+    container_name = parts[-3]
     logging.info(container_name)
 
-    model_type = url.split('/')[-3]
-    logging.info(model_type)
+    date_of_flight = parts[-2]
+    logging.info(date_of_flight)
 
-    project_name = '{0}-{1}'.format(container_name, model_type)
-    logging.info(project_name)
-
-    blob_name = url.split('/', 4)[-1]
+    blob_name = parts[-1]
     logging.info(blob_name)
 
     projects = custom_vision.get_projects()
 
-    project_ids = [project.id for project in projects if project.name == project_name]
+    project_ids = [project.id for project in projects if container_name in project.name]
 
-    if len(project_ids) == 1:
-        project_id = project_ids[0]
-        logging.info(project_id)
+    logging.info('Found Project Ids {}'.format(project_ids))
 
-        blob = azure_storage.blob_service_get_blob_to_bytes(common.healthy_habitat_storage_account_name, common.healthy_habitat_storage_account_key, container_name, blob_name)
+    if len(project_ids) > 0:
+        file_path = os.path.join(os.sep, 'home', 'data', blob_name) # Using os.sep is a bit naff...
 
-        image = np.array(Image.open(io.BytesIO(blob.content)))
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+        start = datetime.datetime.now()
+        logging.info('Downloading {0} started at {1}...'.format(blob_name, start))
+        azure_storage.blob_service_get_blob_to_path(common.healthy_habitat_storage_account_name, common.healthy_habitat_storage_account_key, container_name, '{0}/{1}'.format(date_of_flight, blob_name), file_path)
+        stop = datetime.datetime.now()
+        logging.info('{0} downloaded in {1} seconds to {2}...'.format(blob_name, (stop - start).total_seconds(), file_path))
+
+        start = datetime.datetime.now()
+        logging.info('Opening {0} started at {1}...'.format(blob_name, start))
+        image = imageio.imread(file_path)
+        stop = datetime.datetime.now()
+        logging.info('{0} opened in {1} seconds.'.format(blob_name, (stop - start).total_seconds()))
+
+        image = image[:,:,0:3]
         image_shape = image.shape
+        logging.info(image_shape)
 
         height = 228
         width = 304
@@ -65,25 +82,26 @@ def create_regions_from_blob(body):
             for x in range(0, image_shape[1], width):
                 region = image[y:y + height, x:x + width]
 
+                region_name = '{0}_Region_{1}.jpg'.format(blob_name.split('.')[0], count)
+
                 buffer = io.BytesIO()
 
                 Image.fromarray(region).save(buffer, format='JPEG')
+                
+                for project_id in project_ids:
+                    logging.info('Creating {0} in {1}...'.format(region_name, project_id))
 
-                region_name = '{0}_Region_{1}.jpg'.format(blob_name.split('.')[0], count)
-                logging.info('Creating {0}...'.format(region_name))
+                    result = custom_vision.create_images_from_files(region_name, buffer, project_id)
 
-                result = custom_vision.create_images_from_files(region_name, buffer, project_id)
+                    logging.info(result)
 
-                if result is not '':
-                    logging.error(result)
-                else:
-                    count += 1
-        
+                count += 1
+
         logging.info('Created {0}.'.format(count))
 
         return 'Success'
     else:
-        logging.error('Create one CustomVision.ai Project matching the project name: {0}'.format(project_name))
+        logging.error('No CustomVision.ai Projects found containing: {0}'.format(container_name))
         return ''
 
 def get_response(body):
@@ -94,12 +112,8 @@ def get_response(body):
 
 def is_blob_created_event(body):
     logging.info('In is_blob_created_event...')
-    logging.info(body)
-    logging.info(body[0]['eventType'])
     return body and body[0] and body[0]['eventType'] and body[0]['eventType'] == "Microsoft.Storage.BlobCreated"
 
 def is_subscription_validation_event(body):
     logging.info('In is_subscription_validation_event...')
-    logging.info(body)
-    logging.info(body[0]['eventType'])
     return body and body[0] and body[0]['eventType'] and body[0]['eventType'] == "Microsoft.EventGrid.SubscriptionValidationEvent"
