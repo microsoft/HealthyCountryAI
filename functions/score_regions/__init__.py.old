@@ -1,0 +1,180 @@
+import io, json, logging, os, requests
+import azure.functions as func
+import numpy as np
+from . import azure_storage
+from . import common
+from . import custom_vision
+from PIL import Image
+from . import sql_database
+
+def main(req: func.HttpRequest) -> func.HttpResponse:
+    '''
+    Create regions from a larger image, score with CustomVision.ai, and save to Storage.
+    '''
+    logging.info('Score Regions Function received a request.')
+
+    body = req.get_json()
+
+    if is_subscription_validation_event(body):
+        return func.HttpResponse(get_response(body))
+    else:
+        if is_blob_created_event(body):
+            result = score_regions_from_blob(body)
+
+            if result is 'Success':
+                return func.HttpResponse(status_code=200)
+
+    return func.HttpResponse(status_code=400)
+
+def score_regions_from_blob(body):
+    logging.info('In score_regions_from_blob...')
+
+    url = body[0]['data']['url']
+    logging.info(url)
+
+    container_name = url.split('/', 4)[-2]
+    logging.info(container_name)
+
+    location_of_flight = container_name.split('-')[0]
+    logging.info(location_of_flight)
+
+    season = container_name.split('-')[1]
+    logging.info(season)
+
+    model_type = url.split('/')[-3]
+    logging.info(model_type)
+
+    date_of_flight = url.split('/')[-2]
+    logging.info(date_of_flight)
+
+    project_name = '{0}-{1}'.format(container_name, model_type)
+    logging.info(project_name)
+
+    blob_name = url.split('/', 4)[-1]
+    logging.info(blob_name)
+
+    data = '{0}'.format(body).replace('\'', '"')
+    logging.info(data)
+
+    sas_url = resize_image(container_name, blob_name, url)
+    logging.info(sas_url)
+
+    iteration_name = ''
+
+    if model_type == 'animals':
+        iteration_name = common.custom_vision_animal_iteration_name
+        project_id = common.custom_vision_animal_project_id
+    elif model_type == 'parragrass':
+        iteration_name = common.custom_vision_parragrass_iteration_name
+        project_id = common.custom_vision_parragrass_project_id
+
+    logging.info(iteration_name)
+    logging.info(project_id)
+
+    if iteration_name == '':
+        logging.error('Set environment variables for CUSTOM_VISION_ANIMAL_ITERATION_NAME and CUSTOM_VISION_PARRAGRASS_ITERATION_NAME')
+        return ''
+
+    if project_id == '':
+        logging.error('Set environment variables for CUSTOM_VISION_ANIMAL_PROJECT_ID and CUSTOM_VISION_PARRAGRASS_PROJECT_ID')
+        return ''
+
+    blob = azure_storage.blob_service_get_blob_to_bytes(common.healthy_habitat_storage_account_name, common.healthy_habitat_storage_account_key, container_name, blob_name)
+
+    image = np.array(Image.open(io.BytesIO(blob.content)))
+    image_shape = image.shape
+
+    height = 228
+    width = 304
+
+    count = 0
+
+    for y in range(0, image_shape[0], height):
+        for x in range(0, image_shape[1], width):
+            region = image[y:y + height, x:x + width]
+
+            buffer = io.BytesIO()
+
+            Image.fromarray(region).save(buffer, format='JPEG')
+
+            region_name = '{0}_Region_{1}.jpg'.format(blob_name.split('.')[0], count)
+            logging.info('Scoring {0}...'.format(region_name))
+
+            result = None
+
+            if model_type == 'animals':
+                result = custom_vision.detect_image(project_id, iteration_name, buffer)
+
+                logging.info(result)
+                
+                for prediction in result.predictions:
+                    logging.info(prediction.tag_id)
+                    logging.info(prediction.tag_name)
+                    logging.info(prediction.probability)
+                    
+                    sql_database.insert_animal_result(date_of_flight, location_of_flight, season, blob_name, region_name, prediction.tag_name, prediction.probability, sas_url, logging)
+            elif model_type == 'parragrass':
+                result = custom_vision.classify_image(project_id, iteration_name, buffer)
+
+                logging.info(result)
+                
+                for prediction in result.predictions:
+                    logging.info(prediction.tag_id)
+                    logging.info(prediction.tag_name)
+                    logging.info(prediction.probability)
+                    
+                    sql_database.insert_paragrass_result(date_of_flight, location_of_flight, season, blob_name, region_name, prediction.tag_name, prediction.probability, sas_url, logging)
+            
+            count += 1
+
+    logging.info('Scored {0}.'.format(count))
+
+    return 'Success'
+
+def get_response(body):
+    logging.info('In get_response...')
+    response = {}
+    response['validationResponse'] = body[0]['data']['validationCode']
+    return json.dumps(response)
+
+def is_blob_created_event(body):
+    logging.info('In is_blob_created_event...')
+    logging.info(body)
+    logging.info(body[0]['eventType'])
+    return body and body[0] and body[0]['eventType'] and body[0]['eventType'] == "Microsoft.Storage.BlobCreated"
+
+def is_subscription_validation_event(body):
+    logging.info('In is_subscription_validation_event...')
+    logging.info(body)
+    logging.info(body[0]['eventType'])
+    return body and body[0] and body[0]['eventType'] and body[0]['eventType'] == "Microsoft.EventGrid.SubscriptionValidationEvent"
+
+
+def resize_image(container_name, blob_name, url):
+    logging.info('In resize_image...')
+
+    height = int(common.image_resize_height) 
+    width = int(common.image_resize_width)
+
+    blob = azure_storage.blob_service_get_blob_to_bytes(common.healthy_habitat_storage_account_name, common.healthy_habitat_storage_account_key, container_name, blob_name)
+
+    image = Image.open(io.BytesIO(blob.content))
+    logging.info(image.size)
+
+    image = image.resize((width, height))
+    logging.info(image.size)
+
+    buffer = io.BytesIO()
+    image.save(buffer, format='JPEG')
+
+    path = '{0}/{1}'.format(container_name, blob_name)
+
+    azure_storage.blob_service_create_blob_from_bytes(common.healthy_habitat_storage_account_name, common.healthy_habitat_storage_account_key, common.resized_container_name, path, buffer.getvalue())
+
+    sas = azure_storage.blob_service_generate_blob_shared_access_signature(common.healthy_habitat_storage_account_name, common.healthy_habitat_storage_account_key, common.resized_container_name, path)
+
+    url_parts = url.split('/')
+
+    sas_url = '{0}//{1}/{2}/{3}/{4}/{5}/{6}?{7}'.format(url_parts[0], url_parts[2], common.resized_container_name, url_parts[3], url_parts[4], url_parts[5], url_parts[6], sas)
+
+    return sas_url

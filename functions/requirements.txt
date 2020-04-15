@@ -5,3 +5,4 @@ imageio
 numpy
 Pillow
 pyodbc
+rasterio

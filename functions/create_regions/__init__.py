@@ -4,10 +4,9 @@ import numpy as np
 from . import azure_storage
 from . import common
 from . import custom_vision
-from PIL import Image
-
 from azure.cognitiveservices.vision.customvision.training import CustomVisionTrainingClient
 from azure.cognitiveservices.vision.customvision.training.models import ImageFileCreateEntry
+from PIL import Image
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     '''
