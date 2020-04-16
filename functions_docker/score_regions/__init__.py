@@ -1,4 +1,4 @@
-import datetime, imageio, io, json, logging, os, rasterio, sys
+import datetime, io, json, logging, os, rasterio, sys
 import azure.functions as func
 import numpy as np
 from . import azure_storage
@@ -43,6 +43,23 @@ def score_regions_from_blob(body):
 
     blob_name = parts[-1]
     logging.info(blob_name)
+
+    file_path = os.path.join(os.sep, 'home', 'data', blob_name) # Using os.sep is a bit naff...
+
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+    start = datetime.datetime.now()
+    logging.info('Downloading {0} started at {1}...'.format(blob_name, start))
+    azure_storage.blob_service_get_blob_to_path(common.healthy_habitat_storage_account_name, common.healthy_habitat_storage_account_key, container_name, '{0}/{1}'.format(date_of_flight, blob_name), file_path)
+    stop = datetime.datetime.now()
+    logging.info('{0} downloaded in {1} seconds to {2}...'.format(blob_name, (stop - start).total_seconds(), file_path))
+
+    start = datetime.datetime.now()
+    logging.info('Opening {0} started at {1}...'.format(blob_name, start))
+    dataset = rasterio.open(file_path)
+    stop = datetime.datetime.now()
+    logging.info('{0} opened in {1} seconds.'.format(blob_name, (stop - start).total_seconds()))
 
     projects = custom_vision.get_projects()
 
