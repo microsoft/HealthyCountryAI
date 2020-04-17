@@ -63,7 +63,7 @@ def score_regions_from_blob(body):
 
                 latest_iterations.append(iterations[0])
 
-    logging.info('Found {0} Iterations {}'.format(len(latest_iterations)))
+    logging.info('Found {0} Iterations'.format(len(latest_iterations)))
 
     if len(latest_iterations) > 0:
         file_path = os.path.join(os.sep, 'home', 'data', blob_name) # Using os.sep is a bit naff...
@@ -200,7 +200,7 @@ def score_regions_from_blob(body):
                     untagged_images_habitat = []
                     counter_habitat=0
                 '''
-                
+
                 count += 1
 
         return 'Success'
