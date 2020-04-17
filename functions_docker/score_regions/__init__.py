@@ -6,7 +6,9 @@ from . import common
 from . import custom_vision
 from azure.cognitiveservices.vision.customvision.training import CustomVisionTrainingClient
 from azure.cognitiveservices.vision.customvision.training.models import ImageFileCreateEntry
+from os import listdir
 from PIL import Image
+from rasterio.windows import Window
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     '''
@@ -83,19 +85,26 @@ def score_regions_from_blob(body):
         stop = datetime.datetime.now()
         logging.info('{0} opened in {1} seconds.'.format(blob_name, (stop - start).total_seconds()))
 
-        image = cv2.imread(file_path)
+        dataset_width = dataset.width
+        dataset_height = dataset.height
 
-        image_shape = image.shape
-        logging.info(image_shape)
+        logging.info(dataset_width)
+        logging.info(dataset_height)
+
+        rasterio.copy(file_path, '{0}.JPG'.format(file_path.split('.')[0]), driver='JPEG')
+
+        logging.info(os.sep.join(file_path.split(os.sep)[-1]))
+        logging.info(listdir(os.sep.join(file_path.split(os.sep)[-1])))
 
         height = 228
         width = 304
 
         count = 0
     
-        for y in range(0, image_shape[0], height):
-            for x in range(0, image_shape[1], width):
-                region = image[y:y + height, x:x + width]
+        for y in range(0, dataset_height, height):
+            for x in range(0, dataset_width, width):
+                window = Window(x, y, width, height)
+                #region = image[y:y + height, x:x + width]
                 
                 y1 = (y + height) / 2
                 x1 = (x + width) / 2
@@ -105,9 +114,9 @@ def score_regions_from_blob(body):
 
                 logging.info('{0} {1}'.foramt(latitude, longitude))
 
-                buffer = io.BytesIO()
+                #buffer = io.BytesIO()
 
-                Image.fromarray(region).save(buffer, format='JPEG')
+                #Image.fromarray(region).save(buffer, format='JPEG')
 
                 '''
                 pil_im = Image.fromarray(region)
