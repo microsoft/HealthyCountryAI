@@ -110,7 +110,7 @@ def score_regions_from_blob(body):
                 latitude = coordinates[0]
                 longitude = coordinates[1]
 
-                logging.info('{0} {1}'.foramt(latitude, longitude))
+                logging.info('{0} {1}'.format(latitude, longitude))
 
                 #buffer = io.BytesIO()
 
