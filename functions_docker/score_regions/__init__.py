@@ -91,8 +91,6 @@ def score_regions_from_blob(body):
         logging.info(dataset_width)
         logging.info(dataset_height)
 
-        rasterio.copy(file_path, '{0}.JPG'.format(file_path.split('.')[0]), driver='JPEG')
-
         logging.info(os.sep.join(file_path.split(os.sep)[-1]))
         logging.info(listdir(os.sep.join(file_path.split(os.sep)[-1])))
 
