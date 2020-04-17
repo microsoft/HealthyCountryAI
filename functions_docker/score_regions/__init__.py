@@ -91,8 +91,8 @@ def score_regions_from_blob(body):
         logging.info(dataset_width)
         logging.info(dataset_height)
 
-        logging.info(os.sep.join(file_path.split(os.sep)[-1]))
-        logging.info(listdir(os.sep.join(file_path.split(os.sep)[-1])))
+        logging.info(os.sep.join(file_path.split(os.sep)[0:-1]))
+        logging.info(listdir(os.sep.join(file_path.split(os.sep)[0:-1])))
 
         height = 228
         width = 304
