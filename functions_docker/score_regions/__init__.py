@@ -99,8 +99,6 @@ def score_regions_from_blob(body):
         width = 304
 
         count = 0
-        
-        fp = raster.with_suffix('.jpg')
 
         while count < 1:
             for y in range(0, raster_height, height):
@@ -115,7 +113,7 @@ def score_regions_from_blob(body):
                         'dtype': 'uint8'
                     }
                     
-                    with rasterio.open(fp, 'w', **profile) as out:
+                    with rasterio.open('{0}.JPG'.format(file_path.split('.')[0]), 'w', **profile) as out:
                         out.write(window)
 
                     y1 = (y + height) / 2
