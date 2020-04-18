@@ -81,16 +81,16 @@ def score_regions_from_blob(body):
 
         start = datetime.datetime.now()
         logging.info('Opening {0} started at {1}...'.format(blob_name, start))
-        dataset = rasterio.open(file_path)
+        raster = rasterio.open(file_path)
         stop = datetime.datetime.now()
         logging.info('{0} opened in {1} seconds.'.format(blob_name, (stop - start).total_seconds()))
         
-        dataset_width = dataset.width
-        dataset_height = dataset.height
+        raster_width = raster.width
+        raster_height = raster.height
 
-        logging.info(dataset_width)
-        logging.info(dataset_height)
-        logging.info(dataset.count)
+        logging.info(raster_width)
+        logging.info(raster_height)
+        logging.info(raster.count)
 
         logging.info(os.sep.join(file_path.split(os.sep)[0:-1]))
         logging.info(listdir(os.sep.join(file_path.split(os.sep)[0:-1])))
@@ -100,21 +100,27 @@ def score_regions_from_blob(body):
 
         count = 0
         
-        fp = dataset.with_suffix('.jpeg')
+        fp = raster.with_suffix('.jpg')
 
         while count < 1:
-            for y in range(0, dataset_height, height):
-                for x in range(0, dataset_width, width):
-                    window = Window(x, y, width, height)
-                    b, g, r = (window.read(k) for k in (1, 2, 3))
+            for y in range(0, raster_height, height):
+                for x in range(0, raster_width, width):
+                    window = raster.read(window=rasterio.windows.Window(x, y, width, height))
 
-                    with rasterio.open(fp, 'w', driver='JPEG', width=width, height=height, count=3) as out_file:
-                        for k in (1, 2, 3):
-                            out_file.write(window.read(k), indexes=k, window=window)
+                    profile = {
+                        "driver": "JPEG",
+                        "count": 3,
+                        "height": height,
+                        "width": width,
+                        'dtype': 'uint8'
+                    }
+                    
+                    with rasterio.open(fp, 'w', **profile) as out:
+                        out.write(window)
 
                     y1 = (y + height) / 2
                     x1 = (x + width) / 2
-                    coordinates = dataset.xy(x1, y1)
+                    coordinates = raster.xy(x1, y1)
                     latitude = coordinates[0]
                     longitude = coordinates[1]
 
