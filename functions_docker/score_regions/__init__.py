@@ -107,7 +107,7 @@ def score_regions_from_blob(body):
 
                     profile = {
                         "driver": "JPEG",
-                        "count": 3,
+                        "count": 4,
                         "height": height,
                         "width": width,
                         'dtype': 'uint8'
