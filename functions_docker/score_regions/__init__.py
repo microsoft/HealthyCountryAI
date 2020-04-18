@@ -91,6 +91,15 @@ def score_regions_from_blob(body):
         logging.info(dataset_width)
         logging.info(dataset_height)
 
+        dataset_profile = dataset.profile
+
+        profile['driver']='JPEG'
+
+        fp = dataset.with_suffix('.jpeg')
+
+        with rasterio.open(fp, 'w', **dataset_profile) as out_file:
+            out_file.write(dataset)
+
         logging.info(os.sep.join(file_path.split(os.sep)[0:-1]))
         logging.info(listdir(os.sep.join(file_path.split(os.sep)[0:-1])))
 
@@ -99,7 +108,7 @@ def score_regions_from_blob(body):
 
         count = 0
     
-        while count < 10:
+        while count < 1:
             for y in range(0, dataset_height, height):
                 for x in range(0, dataset_width, width):
                     window = Window(x, y, width, height)
