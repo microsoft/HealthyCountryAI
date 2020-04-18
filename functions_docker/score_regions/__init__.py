@@ -93,7 +93,7 @@ def score_regions_from_blob(body):
 
         dataset_profile = dataset.profile
 
-        profile['driver']='JPEG'
+        dataset_profile['driver'] = 'JPEG'
 
         fp = dataset.with_suffix('.jpeg')
 
