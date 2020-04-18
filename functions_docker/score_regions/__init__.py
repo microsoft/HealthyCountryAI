@@ -84,21 +84,13 @@ def score_regions_from_blob(body):
         dataset = rasterio.open(file_path)
         stop = datetime.datetime.now()
         logging.info('{0} opened in {1} seconds.'.format(blob_name, (stop - start).total_seconds()))
-
+        
         dataset_width = dataset.width
         dataset_height = dataset.height
 
         logging.info(dataset_width)
         logging.info(dataset_height)
-
-        dataset_profile = dataset.profile
-
-        dataset_profile['driver'] = 'JPEG'
-
-        fp = dataset.with_suffix('.jpeg')
-
-        with rasterio.open(fp, 'w', **dataset_profile) as out_file:
-            out_file.write(dataset)
+        logging.info(dataset.count)
 
         logging.info(os.sep.join(file_path.split(os.sep)[0:-1]))
         logging.info(listdir(os.sep.join(file_path.split(os.sep)[0:-1])))
@@ -107,13 +99,19 @@ def score_regions_from_blob(body):
         width = 304
 
         count = 0
-    
+        
+        fp = dataset.with_suffix('.jpeg')
+
         while count < 1:
             for y in range(0, dataset_height, height):
                 for x in range(0, dataset_width, width):
                     window = Window(x, y, width, height)
-                    #region = image[y:y + height, x:x + width]
-                    
+                    b, g, r = (window.read(k) for k in (1, 2, 3))
+
+                    with rasterio.open(fp, 'w', driver='JPEG', width=width, height=height, count=3) as out_file:
+                        for k in (1, 2, 3):
+                            out_file.write(window.read(k), indexes=k, window=window)
+
                     y1 = (y + height) / 2
                     x1 = (x + width) / 2
                     coordinates = dataset.xy(x1, y1)
