@@ -1,7 +1,7 @@
 # To enable ssh & remote debugging on app service change the base image to the one below
 # FROM mcr.microsoft.com/azure-functions/python:2.0-python3.7-appservice
 #!/usr/bin/env bash
-FROM mcr.microsoft.com/azure-functions/python:2.0-python3.7
+FROM mcr.microsoft.com/azure-functions/python:2.0-python3.7-appservice
 
 RUN apt-get update
 RUN apt-get install -y python-numpy gdal-bin libgdal-dev g++

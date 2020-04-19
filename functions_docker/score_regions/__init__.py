@@ -92,9 +92,6 @@ def score_regions_from_blob(body):
         logging.info(raster_height)
         logging.info(raster.count)
 
-        logging.info(os.sep.join(file_path.split(os.sep)[0:-1]))
-        logging.info(listdir(os.sep.join(file_path.split(os.sep)[0:-1])))
-
         height = 228
         width = 304
 
@@ -121,6 +118,11 @@ def score_regions_from_blob(body):
 
         logging.info('{0} {1}'.format(latitude, longitude))
 
+        logging.info(os.sep.join(file_path.split(os.sep)[0:-1]))
+        logging.info(listdir(os.sep.join(file_path.split(os.sep)[0:-1])))
+
+        image = cv2.imread('{0}.JPG'.format(file_path.split('.')[0]))
+        logging.info(image)
         '''
         while count < 1:
             for y in range(0, raster_height, height):
