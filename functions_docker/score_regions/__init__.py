@@ -123,6 +123,22 @@ def score_regions_from_blob(body):
 
         image = cv2.imread('{0}.JPG'.format(file_path.split('.')[0]))
         logging.info(image)
+        logging.info(image.shape)
+
+        region_name = '{0}_Region_{1}.jpg'.format(blob_name.split('.')[0], count)
+
+        buffer = io.BytesIO()
+
+        Image.fromarray(image).save(buffer, format='JPEG')
+        
+        project_id = '84768e1b-02c0-467b-ab77-538fa0b612fa'
+
+        logging.info('Creating {0} in {1}...'.format(region_name, project_id))
+
+        result = custom_vision.create_images_from_files(region_name, buffer, project_id)
+
+        logging.info(result)
+
         '''
         while count < 1:
             for y in range(0, raster_height, height):
