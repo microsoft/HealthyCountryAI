@@ -100,6 +100,28 @@ def score_regions_from_blob(body):
 
         count = 0
 
+        window = raster.read(window=rasterio.windows.Window(0, 0, width, height))
+
+        profile = {
+            "driver": "JPEG",
+            "count": 4,
+            "height": height,
+            "width": width,
+            'dtype': 'uint8'
+        }
+            
+        with rasterio.open('{0}.JPG'.format(file_path.split('.')[0]), 'w', **profile) as out:
+            out.write(window)
+
+        y1 = (0 + height) / 2
+        x1 = (0 + width) / 2
+        coordinates = raster.xy(x1, y1)
+        latitude = coordinates[0]
+        longitude = coordinates[1]
+
+        logging.info('{0} {1}'.format(latitude, longitude))
+
+        '''
         while count < 1:
             for y in range(0, raster_height, height):
                 for x in range(0, raster_width, width):
@@ -128,7 +150,6 @@ def score_regions_from_blob(body):
 
                     #Image.fromarray(region).save(buffer, format='JPEG')
 
-                    '''
                     pil_im = Image.fromarray(region)
                     region_name = '{0}_Region_{1}.jpg'.format(blob_name.split('.')[0], count)
                     region_namez = '{0}/{1}'.format(common.resized_container_name, region_name)
@@ -186,10 +207,9 @@ def score_regions_from_blob(body):
                         untagged_images_animal=custom_vision.prepare_untagged_images(buffer,region_name,untagged_images_animal)
                         counter_animal = counter_animal +1
                         sas_url = resize_save_image(pil_im, region_name, url)
-                    '''
 
-                    '''
                     result_habitat = custom_vision.classify_image(project_id_habitat, iteration_name_habitat, buffer)
+
                     if result_habitat != -1:
                         logging.info(result)
                         update_indicator = 0
@@ -218,9 +238,9 @@ def score_regions_from_blob(body):
                         result_region = custom_vision.create_images_from_files(untagged_images_habitat, project_id_habitat)
                         untagged_images_habitat = []
                         counter_habitat=0
-                    '''
+        '''
 
-                count += 1
+        count += 1
 
         return 'Success'
     else:
