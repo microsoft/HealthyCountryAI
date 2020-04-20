@@ -10,14 +10,6 @@ from os import listdir
 from PIL import Image
 from rasterio.windows import Window
 
-URL = None
-PARTS = None
-CONTAINER_NAME = None
-DATE_OF_FLIGHT = None
-BLOB_NAME = None
-
-DATA_PATH = os.path.join(os.sep, 'home', 'data') # Using os.sep is a bit naff...
-
 def main(req: func.HttpRequest) -> func.HttpResponse:
     '''
     Score regions from a larger TIFF.
@@ -37,32 +29,32 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     return func.HttpResponse(status_code=400)
 
-def get_raster():
-    file_path = os.path.join(DATA_PATH, BLOB_NAME)
+def get_raster(data_path, container_name, date_of_flight, blob_name):
+    file_path = os.path.join(data_path, blob_name)
 
     if os.path.exists(file_path):
         os.remove(file_path)
 
     start = datetime.datetime.now()
-    logging.info('Downloading {0} started at {1}...'.format(BLOB_NAME, start))
+    logging.info('Downloading {0} started at {1}...'.format(blob_name, start))
     azure_storage.blob_service_get_blob_to_path(common.healthy_habitat_storage_account_name, common.healthy_habitat_storage_account_key, container_name, '{0}/{1}'.format(date_of_flight, blob_name), file_path)
     stop = datetime.datetime.now()
-    logging.info('{0} downloaded in {1} seconds to {2}...'.format(BLOB_NAME, (stop - start).total_seconds(), file_path))
+    logging.info('{0} downloaded in {1} seconds to {2}...'.format(blob_name, (stop - start).total_seconds(), file_path))
 
     start = datetime.datetime.now()
-    logging.info('Opening {0} started at {1}...'.format(BLOB_NAME, start))
+    logging.info('Opening {0} started at {1}...'.format(blob_name, start))
     raster = rasterio.open(file_path)
     stop = datetime.datetime.now()
-    logging.info('{0} opened in {1} seconds.'.format(BLOB_NAME, (stop - start).total_seconds()))
+    logging.info('{0} opened in {1} seconds.'.format(blob_name, (stop - start).total_seconds()))
 
     return raster
 
-def get_latest_iterations_ids():
+def get_latest_iterations_ids(container_name):
     projects = custom_vision.get_projects()
 
     projects.sort(key=lambda project: project.name)
 
-    project_ids = [(project.id, project.name) for project in projects if CONTAINER_NAME in project.name]
+    project_ids = [(project.id, project.name) for project in projects if container_name in project.name]
 
     logging.info('Found Project Ids {}'.format(project_ids))
 
@@ -78,28 +70,34 @@ def get_latest_iterations_ids():
 
     logging.info('Found Iteration Ids'.format(latest_iterations_ids))
 
+    return latest_iterations_ids
+
 def parse_body(body):
-    URL = body[0]['data']['url']
-    logging.info(URL)
+    url = body[0]['data']['url']
+    logging.info(url)
 
-    PARTS = URL.split('/')
+    parts = url.split('/')
 
-    CONTAINER_NAME = PARTS[-3]
-    logging.info(CONTAINER_NAME)
+    container_name = parts[-3]
+    logging.info(container_name)
 
-    DATE_OF_FLIGHT = PARTS[-2]
-    logging.info(DATE_OF_FLIGHT)
+    date_of_flight = parts[-2]
+    logging.info(date_of_flight)
 
-    BLOB_NAME = PARTS[-1]
-    logging.info(BLOB_NAME)
+    blob_name = parts[-1]
+    logging.info(blob_name)
+
+    return url, container_name, date_of_flight, blob_name
 
 def score_regions_from_blob(body):
     logging.info('In score_regions_from_blob...')
-    parse_body(body)
-    latest_iterations_ids = get_latest_iterations_ids()
+    url, container_name, date_of_flight, blob_name = parse_body(body)
+    latest_iterations_ids = get_latest_iterations_ids(container_name)
+
+    data_path = os.path.join(os.sep, 'home', 'data') # Using os.sep is a bit naff...
 
     if len(latest_iterations_ids) == 2:
-        raster = get_raster()
+        raster = get_raster(data_path, container_name, date_of_flight, blob_name)
 
         raster_height = raster.height
         raster_width = raster.width
@@ -119,9 +117,9 @@ def score_regions_from_blob(body):
                     logging.info(x)
                     logging.info(y)
 
-                    region_name = '{0}_Region_{1}.JPG'.format(BLOB_NAME.split('.')[0], count)
+                    region_name = '{0}_Region_{1}.JPG'.format(blob_name.split('.')[0], count)
 
-                    region_name_path = os.path.join(DATA_PATH, region_name)
+                    region_name_path = os.path.join(data_path, region_name)
 
                     logging.info(region_name_path)
 
@@ -138,7 +136,7 @@ def score_regions_from_blob(body):
                     with rasterio.open(region_name_path, 'w', **profile) as out:
                         out.write(window)
 
-                    logging.info(listdir(DATA_PATH))
+                    logging.info(listdir(data_path))
 
                     y1 = (y + height) / 2
                     x1 = (x + width) / 2
@@ -253,7 +251,7 @@ def score_regions_from_blob(body):
 
         return 'Success'
     else:
-        logging.error('No CustomVision.ai Projects found containing: {0}'.format(container_name))
+        logging.error('No CustomVision.ai Projects found containing: {0}'.format(CONTAINER_NAME))
         return ''
 
 def get_response(body):
