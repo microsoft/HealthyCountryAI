@@ -10,6 +10,14 @@ from os import listdir
 from PIL import Image
 from rasterio.windows import Window
 
+URL = None
+PARTS = None
+CONTAINER_NAME = None
+DATE_OF_FLIGHT = None
+BLOB_NAME = None
+
+DATA_PATH = os.path.join(os.sep, 'home', 'data') # Using os.sep is a bit naff...
+
 def main(req: func.HttpRequest) -> func.HttpResponse:
     '''
     Score regions from a larger TIFF.
@@ -29,140 +37,142 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     return func.HttpResponse(status_code=400)
 
-def score_regions_from_blob(body):
-    logging.info('In score_regions_from_blob...')
-
-    url = body[0]['data']['url']
-    logging.info(url)
-
-    parts = url.split('/')
-
-    container_name = parts[-3]
-    logging.info(container_name)
-
-    date_of_flight = parts[-2]
-    logging.info(date_of_flight)
-
-    blob_name = parts[-1]
-    logging.info(blob_name)
-
-    projects = custom_vision.get_projects()
-
-    project_ids = [project.id for project in projects if container_name in project.name]
-
-    logging.info('Found Project Ids {}'.format(project_ids))
-
-    latest_iterations = []
-
-    if len(project_ids) > 0:
-        for project_id in project_ids:
-            logging.info('project_id {}'.format(project_id))
-
-            iterations = custom_vision.get_iterations(project_id)
-            
-            if len(iterations) > 0:
-                iterations.sort(reverse=True, key=lambda iteration: iteration.last_modified)
-
-                latest_iterations.append(iterations[0])
-
-    logging.info('Found {0} Iterations'.format(len(latest_iterations)))
-
-    #if len(latest_iterations) > 0:
-    data_path = os.path.join(os.sep, 'home', 'data') # Using os.sep is a bit naff...
-    file_path = os.path.join(data_path, blob_name)
+def get_raster():
+    file_path = os.path.join(DATA_PATH, BLOB_NAME)
 
     if os.path.exists(file_path):
         os.remove(file_path)
 
     start = datetime.datetime.now()
-    logging.info('Downloading {0} started at {1}...'.format(blob_name, start))
+    logging.info('Downloading {0} started at {1}...'.format(BLOB_NAME, start))
     azure_storage.blob_service_get_blob_to_path(common.healthy_habitat_storage_account_name, common.healthy_habitat_storage_account_key, container_name, '{0}/{1}'.format(date_of_flight, blob_name), file_path)
     stop = datetime.datetime.now()
-    logging.info('{0} downloaded in {1} seconds to {2}...'.format(blob_name, (stop - start).total_seconds(), file_path))
+    logging.info('{0} downloaded in {1} seconds to {2}...'.format(BLOB_NAME, (stop - start).total_seconds(), file_path))
 
     start = datetime.datetime.now()
-    logging.info('Opening {0} started at {1}...'.format(blob_name, start))
+    logging.info('Opening {0} started at {1}...'.format(BLOB_NAME, start))
     raster = rasterio.open(file_path)
     stop = datetime.datetime.now()
-    logging.info('{0} opened in {1} seconds.'.format(blob_name, (stop - start).total_seconds()))
-    
-    raster_width = raster.width
-    raster_height = raster.height
+    logging.info('{0} opened in {1} seconds.'.format(BLOB_NAME, (stop - start).total_seconds()))
 
-    logging.info(raster_width)
-    logging.info(raster_height)
-    logging.info(raster.count)
+    return raster
 
-    height = 228
-    width = 304
+def get_latest_iterations_ids():
+    projects = custom_vision.get_projects()
 
-    count = 0
+    projects.sort(key=lambda project: project.name)
 
-    for y in range(2000, raster_height, height):
-        for x in range(2000, raster_width, width):
-            if count < 10:
-                logging.info(x)
-                logging.info(y)
+    project_ids = [(project.id, project.name) for project in projects if CONTAINER_NAME in project.name]
 
-                region_name = '{0}_Region_{1}.JPG'.format(blob_name.split('.')[0], count)
+    logging.info('Found Project Ids {}'.format(project_ids))
 
-                region_name_path = os.path.join(data_path, region_name)
+    latest_iterations_ids = []
 
-                logging.info(region_name_path)
+    for project_id in project_ids:
+        iterations = custom_vision.get_iterations(project_id[0])
+        
+        if len(iterations) > 0:
+            iterations.sort(reverse=True, key=lambda iteration: iteration.last_modified)
 
-                window = raster.read(window=rasterio.windows.Window(x, y, width, height))
+            latest_iterations_ids.append(iterations[0])
 
-                profile = {
-                    "driver": "JPEG",
-                    "count": 4,
-                    "height": height,
-                    "width": width,
-                    'dtype': 'uint8'
-                }
-                
-                with rasterio.open(region_name_path, 'w', **profile) as out:
-                    out.write(window)
+    logging.info('Found Iteration Ids'.format(latest_iterations_ids))
 
-                logging.info(listdir(data_path))
+def parse_body(body):
+    URL = body[0]['data']['url']
+    logging.info(URL)
 
-                y1 = (y + height) / 2
-                x1 = (x + width) / 2
-                coordinates = raster.xy(x1, y1)
-                latitude = coordinates[0]
-                longitude = coordinates[1]
+    PARTS = URL.split('/')
 
-                logging.info('{0} {1}'.format(latitude, longitude))
+    CONTAINER_NAME = PARTS[-3]
+    logging.info(CONTAINER_NAME)
 
-                image = cv2.imread(region_name_path)
-                image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    DATE_OF_FLIGHT = PARTS[-2]
+    logging.info(DATE_OF_FLIGHT)
 
-                buffer = io.BytesIO()
+    BLOB_NAME = PARTS[-1]
+    logging.info(BLOB_NAME)
 
-                Image.fromarray(image).save(buffer, format='JPEG')
-                
-                project_id = '84768e1b-02c0-467b-ab77-538fa0b612fa'
+def score_regions_from_blob(body):
+    logging.info('In score_regions_from_blob...')
+    parse_body(body)
+    latest_iterations_ids = get_latest_iterations_ids()
 
-                logging.info('Creating {0} in {1}...'.format(region_name, project_id))
+    if len(latest_iterations_ids) == 2:
+        raster = get_raster()
 
-                result = custom_vision.create_images_from_files(region_name, buffer, project_id)
+        raster_height = raster.height
+        raster_width = raster.width
 
-                logging.info(result)
+        logging.info(raster_width)
+        logging.info(raster_height)
+        logging.info(raster.count)
 
-                count += 1
+        height = 228
+        width = 304
+
+        count = 0
+
+        for y in range(2000, raster_height, height):
+            for x in range(2000, raster_width, width):
+                if count < 10:
+                    logging.info(x)
+                    logging.info(y)
+
+                    region_name = '{0}_Region_{1}.JPG'.format(BLOB_NAME.split('.')[0], count)
+
+                    region_name_path = os.path.join(DATA_PATH, region_name)
+
+                    logging.info(region_name_path)
+
+                    window = raster.read(window=rasterio.windows.Window(x, y, width, height))
+
+                    profile = {
+                        "driver": "JPEG",
+                        "count": 4,
+                        "height": height,
+                        "width": width,
+                        'dtype': 'uint8'
+                    }
+                    
+                    with rasterio.open(region_name_path, 'w', **profile) as out:
+                        out.write(window)
+
+                    logging.info(listdir(DATA_PATH))
+
+                    y1 = (y + height) / 2
+                    x1 = (x + width) / 2
+                    coordinates = raster.xy(x1, y1)
+                    latitude = coordinates[0]
+                    longitude = coordinates[1]
+
+                    logging.info('{0} {1}'.format(latitude, longitude))
+
+                    region = cv2.imread(region_name_path)
+                    region = cv2.cvtColor(region, cv2.COLOR_BGR2RGB)
+
+                    buffer = io.BytesIO()
+
+                    Image.fromarray(region).save(buffer, format='JPEG')
+                    
+                    project_id = '84768e1b-02c0-467b-ab77-538fa0b612fa'
+
+                    logging.info('Creating {0} in {1}...'.format(region_name, project_id))
+
+                    result = custom_vision.create_images_from_files(region_name, buffer, project_id)
+
+                    logging.info(result)
+
+                    '''
+                    result_animal = custom_vision.detect_image(project_id_animal, iteration_name_animal, buffer)
+                    
+                    if os.path.exists(region_name_path):
+                        os.remove(region_name_path)
+
+                    count += 1
+                    '''
 
                 '''
-                pil_im = Image.fromarray(region)
-                region_name = '{0}_Region_{1}.jpg'.format(blob_name.split('.')[0], count)
-                region_namez = '{0}/{1}'.format(common.resized_container_name, region_name)
-                logging.info('Scoring {0}...'.format(region_namez))
-                blob_namez='{0}_Region_{1}.jpg'.format(stitched_image_name,count)
-                result = None
-                boundingBox = ""
-                stitchedurl = stitch_url
-                sas_url = "x"
-                datecreated = datetime.now()
-
-                result_animal = custom_vision.detect_image(project_id_animal, iteration_name_animal, buffer)
                 if result_animal!=-1:
                     logging.info(result)
 

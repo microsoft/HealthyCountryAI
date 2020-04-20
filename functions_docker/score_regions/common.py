@@ -10,7 +10,7 @@ custom_vision_endpoint = 'https://australiaeast.api.cognitive.microsoft.com/'
 
 #custom_vision_parragrass_project_id = os.getenv('CUSTOM_VISION_PARRAGRASS_PROJECT_ID')
 
-#custom_vision_prediction_key = os.getenv('CUSTOM_VISION_PREDICTION_KEY')
+custom_vision_prediction_key = os.getenv('CUSTOM_VISION_PREDICTION_KEY')
 
 custom_vision_training_key = os.getenv('CUSTOM_VISION_TRAINING_KEY')
 
