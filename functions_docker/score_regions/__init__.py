@@ -147,6 +147,8 @@ def score_regions_from_blob(body):
 
                 logging.info(result)
 
+                count += 1
+
                 '''
                 pil_im = Image.fromarray(region)
                 region_name = '{0}_Region_{1}.jpg'.format(blob_name.split('.')[0], count)
@@ -237,8 +239,6 @@ def score_regions_from_blob(body):
                     untagged_images_habitat = []
                     counter_habitat=0
                 '''
-
-                count += 1
 
         return 'Success'
     else:
