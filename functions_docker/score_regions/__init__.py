@@ -68,7 +68,8 @@ def score_regions_from_blob(body):
     logging.info('Found {0} Iterations'.format(len(latest_iterations)))
 
     #if len(latest_iterations) > 0:
-    file_path = os.path.join(os.sep, 'home', 'data', blob_name) # Using os.sep is a bit naff...
+    data_path = os.path.join(os.sep, 'home', 'data') # Using os.sep is a bit naff...
+    file_path = os.path.join(data_path, blob_name)
 
     if os.path.exists(file_path):
         os.remove(file_path)
@@ -100,6 +101,15 @@ def score_regions_from_blob(body):
     for y in range(0, raster_height, height):
         for x in range(0, raster_width, width):
             if count < 10:
+                logging.info(x)
+                logging.info(y)
+
+                region_name = '{0}_Region_{1}.JPG'.format(blob_name.split('.')[0], count)
+
+                region_name_path = os.path.join(data_path, region_name)
+
+                logging.log(region_name_path)
+
                 window = raster.read(window=rasterio.windows.Window(x, y, width, height))
 
                 profile = {
@@ -110,11 +120,10 @@ def score_regions_from_blob(body):
                     'dtype': 'uint8'
                 }
                 
-                with rasterio.open('{0}.JPG'.format(file_path.split('.')[0]), 'w', **profile) as out:
+                with rasterio.open(region_name_path, 'w', **profile) as out:
                     out.write(window)
 
-                logging.info(os.sep.join(file_path.split(os.sep)[0:-1]))
-                logging.info(listdir(os.sep.join(file_path.split(os.sep)[0:-1])))
+                logging.info(listdir(data_path))
 
                 y1 = (y + height) / 2
                 x1 = (x + width) / 2
@@ -125,10 +134,6 @@ def score_regions_from_blob(body):
                 logging.info('{0} {1}'.format(latitude, longitude))
 
                 image = cv2.imread('{0}.JPG'.format(file_path.split('.')[0]))
-                logging.info(image)
-                logging.info(image.shape)
-
-                region_name = '{0}_Region_{1}.jpg'.format(blob_name.split('.')[0], count)
 
                 buffer = io.BytesIO()
 
