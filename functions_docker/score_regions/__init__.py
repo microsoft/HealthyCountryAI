@@ -49,7 +49,7 @@ def get_raster(data_path, container_name, date_of_flight, blob_name):
 
     return raster
 
-def get_latest_iterations_ids(container_name):
+def get_latest_iteration_ids(container_name):
     projects = custom_vision.get_projects()
 
     projects.sort(key=lambda project: project.name)
@@ -58,7 +58,7 @@ def get_latest_iterations_ids(container_name):
 
     logging.info('Found Project Ids {}'.format(project_ids))
 
-    latest_iterations_ids = []
+    latest_iteration_ids = []
 
     for project_id in project_ids:
         iterations = custom_vision.get_iterations(project_id[0])
@@ -66,11 +66,11 @@ def get_latest_iterations_ids(container_name):
         if len(iterations) > 0:
             iterations.sort(reverse=True, key=lambda iteration: iteration.last_modified)
 
-            latest_iterations_ids.append(iterations[0])
+            latest_iteration_ids.append(iterations[0])
 
-    logging.info('Found Iteration Ids'.format(latest_iterations_ids))
+    logging.info('Found Iteration Ids'.format(latest_iteration_ids))
 
-    return latest_iterations_ids
+    return latest_iteration_ids
 
 def parse_body(body):
     url = body[0]['data']['url']
@@ -92,11 +92,11 @@ def parse_body(body):
 def score_regions_from_blob(body):
     logging.info('In score_regions_from_blob...')
     url, container_name, date_of_flight, blob_name = parse_body(body)
-    latest_iterations_ids = get_latest_iterations_ids(container_name)
+    latest_iteration_ids = get_latest_iteration_ids(container_name)
 
     data_path = os.path.join(os.sep, 'home', 'data') # Using os.sep is a bit naff...
 
-    if len(latest_iterations_ids) == 2:
+    if len(latest_iteration_ids) == 2:
         raster = get_raster(data_path, container_name, date_of_flight, blob_name)
 
         raster_height = raster.height
@@ -163,12 +163,12 @@ def score_regions_from_blob(body):
 
                     '''
                     result_animal = custom_vision.detect_image(project_id_animal, iteration_name_animal, buffer)
-                    
+                    '''
+                                        
                     if os.path.exists(region_name_path):
                         os.remove(region_name_path)
 
                     count += 1
-                    '''
 
                 '''
                 if result_animal!=-1:
