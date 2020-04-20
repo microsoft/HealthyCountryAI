@@ -133,7 +133,7 @@ def score_regions_from_blob(body):
 
                 logging.info('{0} {1}'.format(latitude, longitude))
 
-                image = cv2.imread('{0}.JPG'.format(file_path.split('.')[0]))
+                image = cv2.imread(region_name_path)
 
                 buffer = io.BytesIO()
 
