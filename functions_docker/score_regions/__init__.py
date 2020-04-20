@@ -108,7 +108,7 @@ def score_regions_from_blob(body):
 
                 region_name_path = os.path.join(data_path, region_name)
 
-                logging.log(region_name_path)
+                logging.info(region_name_path)
 
                 window = raster.read(window=rasterio.windows.Window(x, y, width, height))
 
