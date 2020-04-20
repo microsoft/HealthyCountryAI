@@ -96,163 +96,162 @@ def score_regions_from_blob(body):
 
     data_path = os.path.join(os.sep, 'home', 'data') # Using os.sep is a bit naff...
 
-    if len(latest_iteration_ids) == 2:
-        raster = get_raster(data_path, container_name, date_of_flight, blob_name)
+    #if len(latest_iteration_ids) == 2:
+    raster = get_raster(data_path, container_name, date_of_flight, blob_name)
 
-        raster_height = raster.height
-        raster_width = raster.width
+    raster_height = raster.height
+    raster_width = raster.width
 
-        logging.info(raster_width)
-        logging.info(raster_height)
-        logging.info(raster.count)
+    logging.info(raster_width)
+    logging.info(raster_height)
+    logging.info(raster.count)
 
-        height = 228
-        width = 304
+    height = 228
+    width = 304
 
-        count = 0
+    count = 0
 
-        for y in range(2000, raster_height, height):
-            for x in range(2000, raster_width, width):
-                if count < 10:
-                    logging.info(x)
-                    logging.info(y)
+    for y in range(2000, raster_height, height):
+        for x in range(2000, raster_width, width):
+            if count < 10:
+                logging.info(x)
+                logging.info(y)
 
-                    region_name = '{0}_Region_{1}.JPG'.format(blob_name.split('.')[0], count)
+                region_name = '{0}_Region_{1}.JPG'.format(blob_name.split('.')[0], count)
 
-                    region_name_path = os.path.join(data_path, region_name)
+                region_name_path = os.path.join(data_path, region_name)
 
-                    logging.info(region_name_path)
+                logging.info(region_name_path)
 
-                    window = raster.read(window=rasterio.windows.Window(x, y, width, height))
+                window = raster.read(window=rasterio.windows.Window(x, y, width, height))
 
-                    profile = {
-                        "driver": "JPEG",
-                        "count": 4,
-                        "height": height,
-                        "width": width,
-                        'dtype': 'uint8'
-                    }
-                    
-                    with rasterio.open(region_name_path, 'w', **profile) as out:
-                        out.write(window)
+                profile = {
+                    "driver": "JPEG",
+                    "count": 4,
+                    "height": height,
+                    "width": width,
+                    'dtype': 'uint8'
+                }
+                
+                with rasterio.open(region_name_path, 'w', **profile) as out:
+                    out.write(window)
 
-                    logging.info(listdir(data_path))
+                logging.info(listdir(data_path))
 
-                    y1 = (y + height) / 2
-                    x1 = (x + width) / 2
-                    coordinates = raster.xy(x1, y1)
-                    latitude = coordinates[0]
-                    longitude = coordinates[1]
+                y1 = (y + height) / 2
+                x1 = (x + width) / 2
+                coordinates = raster.xy(x1, y1)
+                latitude = coordinates[0]
+                longitude = coordinates[1]
 
-                    logging.info('{0} {1}'.format(latitude, longitude))
+                logging.info('{0} {1}'.format(latitude, longitude))
 
-                    region = cv2.imread(region_name_path)
-                    region = cv2.cvtColor(region, cv2.COLOR_BGR2RGB)
+                region = cv2.imread(region_name_path)
+                region = cv2.cvtColor(region, cv2.COLOR_BGR2RGB)
 
-                    buffer = io.BytesIO()
+                buffer = io.BytesIO()
 
-                    Image.fromarray(region).save(buffer, format='JPEG')
-                    
-                    project_id = '84768e1b-02c0-467b-ab77-538fa0b612fa'
+                Image.fromarray(region).save(buffer, format='JPEG')
+                
+                project_id = '84768e1b-02c0-467b-ab77-538fa0b612fa'
 
-                    logging.info('Creating {0} in {1}...'.format(region_name, project_id))
+                logging.info('Creating {0} in {1}...'.format(region_name, project_id))
 
-                    result = custom_vision.create_images_from_files(region_name, buffer, project_id)
+                result = custom_vision.create_images_from_files(region_name, buffer, project_id)
 
-                    logging.info(result)
-
-                    '''
-                    result_animal = custom_vision.detect_image(project_id_animal, iteration_name_animal, buffer)
-                    '''
-                                        
-                    if os.path.exists(region_name_path):
-                        os.remove(region_name_path)
-
-                    count += 1
+                logging.info(result)
 
                 '''
-                if result_animal!=-1:
-                    logging.info(result)
+                result_animal = custom_vision.detect_image(project_id_animal, iteration_name_animal, buffer)
+                '''
 
-                    xc1 = 0  # egret
-                    xc2 = 0  # goose
-                    xc3 = 0  # duck
-                    update_indicator = 0
-                    for prediction in result_animal.predictions:
+                if os.path.exists(region_name_path):
+                    os.remove(region_name_path)
 
-                        if prediction.tag_name == "duck":
-                            xc1 = xc1 + 1
-                        elif prediction.tag_name == "goose":
-                            xc2 = xc2 + 1
-                        elif prediction.tag_name == "egret":
-                            xc3 = xc3 + 1
+                count += 1
 
-                        logging.info(prediction.tag_id)
-                        logging.info(prediction.tag_name)
-                        logging.info(prediction.probability)
+            '''
+            if result_animal!=-1:
+                logging.info(result)
 
-                        logging.info(prediction.bounding_box.left)
-                        logging.info(prediction.bounding_box.top)
-                        logging.info(prediction.bounding_box.width)
-                        logging.info(prediction.bounding_box.height)
-                        boundingBox1 = '{0},{1},{2},{3}'.format(prediction.bounding_box.left, prediction.bounding_box.top,prediction.bounding_box.width,prediction.bounding_box.height)
-                        logging.info(datecreated)
-                        sql_database.insert_animal_result(date_of_flight, location_of_flight, season, blob_namez, sas_url,
+                xc1 = 0  # egret
+                xc2 = 0  # goose
+                xc3 = 0  # duck
+                update_indicator = 0
+                for prediction in result_animal.predictions:
+
+                    if prediction.tag_name == "duck":
+                        xc1 = xc1 + 1
+                    elif prediction.tag_name == "goose":
+                        xc2 = xc2 + 1
+                    elif prediction.tag_name == "egret":
+                        xc3 = xc3 + 1
+
+                    logging.info(prediction.tag_id)
+                    logging.info(prediction.tag_name)
+                    logging.info(prediction.probability)
+
+                    logging.info(prediction.bounding_box.left)
+                    logging.info(prediction.bounding_box.top)
+                    logging.info(prediction.bounding_box.width)
+                    logging.info(prediction.bounding_box.height)
+                    boundingBox1 = '{0},{1},{2},{3}'.format(prediction.bounding_box.left, prediction.bounding_box.top,prediction.bounding_box.width,prediction.bounding_box.height)
+                    logging.info(datecreated)
+                    sql_database.insert_animal_result(date_of_flight, location_of_flight, season, blob_namez, sas_url,
+                                                    region_namez, prediction.tag_name, prediction.probability,
+                                                    boundingBox1, stitchedurl, latitude, longitude, iteration_name_animal,logging)
+                    update_indicator = update_indicator + 1
+
+                tac1 = "Goose" + ":" + str(xc2)
+                tac2 = "Duck" + ":" + str(xc1)
+                tac3 = "Egret" + ":" + str(xc3)
+
+                sas_url = resize_save_image(pil_im, region_name, url)
+
+                if update_indicator > 0:
+                    sql_database.update_animal_result(region_namez, sas_url, logging)
+                logging.info(sas_url)
+            else:
+                #save_jpg(pil_im, region_name, url)
+                untagged_images_animal=custom_vision.prepare_untagged_images(buffer,region_name,untagged_images_animal)
+                counter_animal = counter_animal +1
+                sas_url = resize_save_image(pil_im, region_name, url)
+
+            result_habitat = custom_vision.classify_image(project_id_habitat, iteration_name_habitat, buffer)
+
+            if result_habitat != -1:
+                logging.info(result)
+                update_indicator = 0
+                for prediction in result_habitat.predictions:
+                    logging.info(prediction.tag_id)
+                    logging.info(prediction.tag_name)
+                    logging.info(prediction.probability)
+                    sql_database.insert_parragrass_result(date_of_flight, location_of_flight, season, blob_namez, sas_url,
                                                         region_namez, prediction.tag_name, prediction.probability,
-                                                        boundingBox1, stitchedurl, latitude, longitude, iteration_name_animal,logging)
-                        update_indicator = update_indicator + 1
+                                                        stitchedurl, latitude, longitude, iteration_name_habitat,logging)
+                    update_indicator = update_indicator + 1
 
-                    tac1 = "Goose" + ":" + str(xc2)
-                    tac2 = "Duck" + ":" + str(xc1)
-                    tac3 = "Egret" + ":" + str(xc3)
+                sas_url = resize_save_image(pil_im, region_name, url)
+                if update_indicator > 0:
+                    sql_database.update_Paragrass_result(region_namez, sas_url, logging)
+                logging.info(sas_url)
+            else:
+                untagged_images_habitat=custom_vision.prepare_untagged_images(buffer,region_name, untagged_images_habitat)
+                counter_habitat = counter_habitat + 1
 
-                    sas_url = resize_save_image(pil_im, region_name, url)
-
-                    if update_indicator > 0:
-                        sql_database.update_animal_result(region_namez, sas_url, logging)
-                    logging.info(sas_url)
-                else:
-                    #save_jpg(pil_im, region_name, url)
-                    untagged_images_animal=custom_vision.prepare_untagged_images(buffer,region_name,untagged_images_animal)
-                    counter_animal = counter_animal +1
-                    sas_url = resize_save_image(pil_im, region_name, url)
-
-                result_habitat = custom_vision.classify_image(project_id_habitat, iteration_name_habitat, buffer)
-
-                if result_habitat != -1:
-                    logging.info(result)
-                    update_indicator = 0
-                    for prediction in result_habitat.predictions:
-                        logging.info(prediction.tag_id)
-                        logging.info(prediction.tag_name)
-                        logging.info(prediction.probability)
-                        sql_database.insert_parragrass_result(date_of_flight, location_of_flight, season, blob_namez, sas_url,
-                                                            region_namez, prediction.tag_name, prediction.probability,
-                                                            stitchedurl, latitude, longitude, iteration_name_habitat,logging)
-                        update_indicator = update_indicator + 1
-
-                    sas_url = resize_save_image(pil_im, region_name, url)
-                    if update_indicator > 0:
-                        sql_database.update_Paragrass_result(region_namez, sas_url, logging)
-                    logging.info(sas_url)
-                else:
-                    untagged_images_habitat=custom_vision.prepare_untagged_images(buffer,region_name, untagged_images_habitat)
-                    counter_habitat = counter_habitat + 1
-
-                if counter_animal >= 10:
-                    result_region = custom_vision.create_images_from_files(untagged_images_animal, project_id_animal)
-                    untagged_images_animal = []
-                    counter_animal = 0
-                if counter_habitat >= 10:
-                    result_region = custom_vision.create_images_from_files(untagged_images_habitat, project_id_habitat)
-                    untagged_images_habitat = []
-                    counter_habitat=0
-                '''
+            if counter_animal >= 10:
+                result_region = custom_vision.create_images_from_files(untagged_images_animal, project_id_animal)
+                untagged_images_animal = []
+                counter_animal = 0
+            if counter_habitat >= 10:
+                result_region = custom_vision.create_images_from_files(untagged_images_habitat, project_id_habitat)
+                untagged_images_habitat = []
+                counter_habitat=0
+            '''
 
         return 'Success'
-    else:
-        logging.error('No CustomVision.ai Projects found containing: {0}'.format(CONTAINER_NAME))
-        return ''
+    # else:
+    #     return ''
 
 def get_response(body):
     logging.info('In get_response...')
