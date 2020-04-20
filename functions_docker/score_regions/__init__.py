@@ -97,52 +97,9 @@ def score_regions_from_blob(body):
 
     count = 0
 
-    window = raster.read(window=rasterio.windows.Window(0, 0, width, height))
-
-    profile = {
-        "driver": "JPEG",
-        "count": 4,
-        "height": height,
-        "width": width,
-        'dtype': 'uint8'
-    }
-        
-    with rasterio.open('{0}.JPG'.format(file_path.split('.')[0]), 'w', **profile) as out:
-        out.write(window)
-
-    y1 = (0 + height) / 2
-    x1 = (0 + width) / 2
-    coordinates = raster.xy(x1, y1)
-    latitude = coordinates[0]
-    longitude = coordinates[1]
-
-    logging.info('{0} {1}'.format(latitude, longitude))
-
-    logging.info(os.sep.join(file_path.split(os.sep)[0:-1]))
-    logging.info(listdir(os.sep.join(file_path.split(os.sep)[0:-1])))
-
-    image = cv2.imread('{0}.JPG'.format(file_path.split('.')[0]))
-    logging.info(image)
-    logging.info(image.shape)
-
-    region_name = '{0}_Region_{1}.jpg'.format(blob_name.split('.')[0], count)
-
-    buffer = io.BytesIO()
-
-    Image.fromarray(image).save(buffer, format='JPEG')
-    
-    project_id = '84768e1b-02c0-467b-ab77-538fa0b612fa'
-
-    logging.info('Creating {0} in {1}...'.format(region_name, project_id))
-
-    result = custom_vision.create_images_from_files(region_name, buffer, project_id)
-
-    logging.info(result)
-
-    '''
-    while count < 1:
-        for y in range(0, raster_height, height):
-            for x in range(0, raster_width, width):
+    for y in range(0, raster_height, height):
+        for x in range(0, raster_width, width):
+            if count < 10:
                 window = raster.read(window=rasterio.windows.Window(x, y, width, height))
 
                 profile = {
@@ -156,6 +113,9 @@ def score_regions_from_blob(body):
                 with rasterio.open('{0}.JPG'.format(file_path.split('.')[0]), 'w', **profile) as out:
                     out.write(window)
 
+                logging.info(os.sep.join(file_path.split(os.sep)[0:-1]))
+                logging.info(listdir(os.sep.join(file_path.split(os.sep)[0:-1])))
+
                 y1 = (y + height) / 2
                 x1 = (x + width) / 2
                 coordinates = raster.xy(x1, y1)
@@ -164,10 +124,25 @@ def score_regions_from_blob(body):
 
                 logging.info('{0} {1}'.format(latitude, longitude))
 
-                #buffer = io.BytesIO()
+                image = cv2.imread('{0}.JPG'.format(file_path.split('.')[0]))
+                logging.info(image)
+                logging.info(image.shape)
 
-                #Image.fromarray(region).save(buffer, format='JPEG')
+                region_name = '{0}_Region_{1}.jpg'.format(blob_name.split('.')[0], count)
 
+                buffer = io.BytesIO()
+
+                Image.fromarray(image).save(buffer, format='JPEG')
+                
+                project_id = '84768e1b-02c0-467b-ab77-538fa0b612fa'
+
+                logging.info('Creating {0} in {1}...'.format(region_name, project_id))
+
+                result = custom_vision.create_images_from_files(region_name, buffer, project_id)
+
+                logging.info(result)
+
+                '''
                 pil_im = Image.fromarray(region)
                 region_name = '{0}_Region_{1}.jpg'.format(blob_name.split('.')[0], count)
                 region_namez = '{0}/{1}'.format(common.resized_container_name, region_name)
@@ -256,15 +231,14 @@ def score_regions_from_blob(body):
                     result_region = custom_vision.create_images_from_files(untagged_images_habitat, project_id_habitat)
                     untagged_images_habitat = []
                     counter_habitat=0
-        '''
+                '''
 
-        #count += 1
-'''
+                count += 1
+
         return 'Success'
     else:
         logging.error('No CustomVision.ai Projects found containing: {0}'.format(container_name))
         return ''
-'''
 
 def get_response(body):
     logging.info('In get_response...')
