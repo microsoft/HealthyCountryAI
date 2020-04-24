@@ -153,8 +153,11 @@ def score_regions_from_blob(body):
 
                 Image.fromarray(region).save(buffer, format='JPEG')
                 
-                project_id = 'd3bbda39-e52f-497b-9ed6-b3f27a63d516'
-                iteration_name = 'ubir-kurrung-habitat-Iteration1'
+                #project_id = 'd3bbda39-e52f-497b-9ed6-b3f27a63d516' # Habitat
+                #iteration_name = 'ubir-kurrung-habitat-Iteration1' # Habitat
+
+                project_id = 'd4892285-f0da-466b-9122-8c02cc370013' # Animals
+                iteration_name = 'cannonhill-wurrkeng-animals-Iteration5' # Animals
 
                 #logging.info('Creating {0} in {1}...'.format(region_name, project_id))
 
