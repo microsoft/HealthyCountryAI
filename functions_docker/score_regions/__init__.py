@@ -178,7 +178,7 @@ def score_regions_from_blob(body):
                     label = prediction.tag_name
                     probability = prediction.probability
                     url = ''
-                    bounding_box = prediction.bounding_box
+                    bounding_box = ''
 
                     sql_database.insert_animal_result(date_of_flight, location_of_flight, season, region_name, label, probability, url, latitude, longitude, bounding_box, logging)
 
