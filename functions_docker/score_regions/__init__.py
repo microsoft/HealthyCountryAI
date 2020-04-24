@@ -4,6 +4,7 @@ import numpy as np
 from . import azure_storage
 from . import common
 from . import custom_vision
+from . import sql_database
 from azure.cognitiveservices.vision.customvision.training import CustomVisionTrainingClient
 from azure.cognitiveservices.vision.customvision.training.models import ImageFileCreateEntry
 from os import listdir
@@ -167,91 +168,22 @@ def score_regions_from_blob(body):
 
                 result = custom_vision.detect_image(project_id, iteration_name, buffer)
 
-                logging.info(result)
+                for prediction in result:
+                    logging.info(prediction)
+
+                    location_of_flight = container_name
+                    season = container_name
+                    label = prediction.tag_name
+                    probability = prediction.probability
+                    url = ''
+                    bounding_box = prediction.bounding_box
+
+                    sql_database.insert_animal_result(date_of_flight, location_of_flight, season, region_name, label, probability, url, latitude, longitude, bounding_box, logging)
 
                 if os.path.exists(region_name_path):
                     os.remove(region_name_path)
 
                 count += 1
-
-            '''
-            if result_animal!=-1:
-                logging.info(result)
-
-                xc1 = 0  # egret
-                xc2 = 0  # goose
-                xc3 = 0  # duck
-                update_indicator = 0
-                for prediction in result_animal.predictions:
-
-                    if prediction.tag_name == "duck":
-                        xc1 = xc1 + 1
-                    elif prediction.tag_name == "goose":
-                        xc2 = xc2 + 1
-                    elif prediction.tag_name == "egret":
-                        xc3 = xc3 + 1
-
-                    logging.info(prediction.tag_id)
-                    logging.info(prediction.tag_name)
-                    logging.info(prediction.probability)
-
-                    logging.info(prediction.bounding_box.left)
-                    logging.info(prediction.bounding_box.top)
-                    logging.info(prediction.bounding_box.width)
-                    logging.info(prediction.bounding_box.height)
-                    boundingBox1 = '{0},{1},{2},{3}'.format(prediction.bounding_box.left, prediction.bounding_box.top,prediction.bounding_box.width,prediction.bounding_box.height)
-                    logging.info(datecreated)
-                    sql_database.insert_animal_result(date_of_flight, location_of_flight, season, blob_namez, sas_url,
-                                                    region_namez, prediction.tag_name, prediction.probability,
-                                                    boundingBox1, stitchedurl, latitude, longitude, iteration_name_animal,logging)
-                    update_indicator = update_indicator + 1
-
-                tac1 = "Goose" + ":" + str(xc2)
-                tac2 = "Duck" + ":" + str(xc1)
-                tac3 = "Egret" + ":" + str(xc3)
-
-                sas_url = resize_save_image(pil_im, region_name, url)
-
-                if update_indicator > 0:
-                    sql_database.update_animal_result(region_namez, sas_url, logging)
-                logging.info(sas_url)
-            else:
-                #save_jpg(pil_im, region_name, url)
-                untagged_images_animal=custom_vision.prepare_untagged_images(buffer,region_name,untagged_images_animal)
-                counter_animal = counter_animal +1
-                sas_url = resize_save_image(pil_im, region_name, url)
-
-            result_habitat = custom_vision.classify_image(project_id_habitat, iteration_name_habitat, buffer)
-
-            if result_habitat != -1:
-                logging.info(result)
-                update_indicator = 0
-                for prediction in result_habitat.predictions:
-                    logging.info(prediction.tag_id)
-                    logging.info(prediction.tag_name)
-                    logging.info(prediction.probability)
-                    sql_database.insert_parragrass_result(date_of_flight, location_of_flight, season, blob_namez, sas_url,
-                                                        region_namez, prediction.tag_name, prediction.probability,
-                                                        stitchedurl, latitude, longitude, iteration_name_habitat,logging)
-                    update_indicator = update_indicator + 1
-
-                sas_url = resize_save_image(pil_im, region_name, url)
-                if update_indicator > 0:
-                    sql_database.update_Paragrass_result(region_namez, sas_url, logging)
-                logging.info(sas_url)
-            else:
-                untagged_images_habitat=custom_vision.prepare_untagged_images(buffer,region_name, untagged_images_habitat)
-                counter_habitat = counter_habitat + 1
-
-            if counter_animal >= 10:
-                result_region = custom_vision.create_images_from_files(untagged_images_animal, project_id_animal)
-                untagged_images_animal = []
-                counter_animal = 0
-            if counter_habitat >= 10:
-                result_region = custom_vision.create_images_from_files(untagged_images_habitat, project_id_habitat)
-                untagged_images_habitat = []
-                counter_habitat=0
-            '''
 
         return 'Success'
     # else:
@@ -270,30 +202,3 @@ def is_blob_created_event(body):
 def is_subscription_validation_event(body):
     logging.info('In is_subscription_validation_event...')
     return body and body[0] and body[0]['eventType'] and body[0]['eventType'] == "Microsoft.EventGrid.SubscriptionValidationEvent"
-
-'''
-import logging
-
-import azure.functions as func
-
-
-def main(req: func.HttpRequest) -> func.HttpResponse:
-    logging.info('Python HTTP trigger function processed a request.')
-
-    name = req.params.get('name')
-    if not name:
-        try:
-            req_body = req.get_json()
-        except ValueError:
-            pass
-        else:
-            name = req_body.get('name')
-
-    if name:
-        return func.HttpResponse(f"Hello {name}!")
-    else:
-        return func.HttpResponse(
-             "Please pass a name on the query string or in the request body",
-             status_code=400
-        )
-'''
