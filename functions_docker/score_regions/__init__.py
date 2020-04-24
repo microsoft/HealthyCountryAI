@@ -153,17 +153,18 @@ def score_regions_from_blob(body):
 
                 Image.fromarray(region).save(buffer, format='JPEG')
                 
-                project_id = '84768e1b-02c0-467b-ab77-538fa0b612fa'
+                project_id = 'd3bbda39-e52f-497b-9ed6-b3f27a63d516'
+                iteration_name = 'ubir-kurrung-habitat-Iteration1'
 
-                logging.info('Creating {0} in {1}...'.format(region_name, project_id))
+                #logging.info('Creating {0} in {1}...'.format(region_name, project_id))
 
-                result = custom_vision.create_images_from_files(region_name, buffer, project_id)
+                #result = custom_vision.create_images_from_files(region_name, buffer, project_id)
+
+                #logging.info(result)
+
+                result = custom_vision.detect_image(project_id, iteration_name, buffer)
 
                 logging.info(result)
-
-                '''
-                result_animal = custom_vision.detect_image(project_id_animal, iteration_name_animal, buffer)
-                '''
 
                 if os.path.exists(region_name_path):
                     os.remove(region_name_path)
