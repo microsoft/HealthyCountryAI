@@ -168,7 +168,9 @@ def score_regions_from_blob(body):
 
                 result = custom_vision.detect_image(project_id, iteration_name, buffer)
 
-                for prediction in result:
+                predictions = result.predictions
+
+                for prediction in predictions:
                     logging.info(prediction)
 
                     location_of_flight = container_name
