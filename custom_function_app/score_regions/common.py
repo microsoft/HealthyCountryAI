@@ -10,7 +10,7 @@ custom_vision_endpoint = 'https://australiaeast.api.cognitive.microsoft.com/'
 
 #custom_vision_parragrass_project_id = os.getenv('CUSTOM_VISION_PARRAGRASS_PROJECT_ID')
 
-#custom_vision_prediction_key = os.getenv('CUSTOM_VISION_PREDICTION_KEY')
+custom_vision_prediction_key = os.getenv('CUSTOM_VISION_PREDICTION_KEY')
 
 custom_vision_training_key = os.getenv('CUSTOM_VISION_TRAINING_KEY')
 
@@ -26,10 +26,10 @@ healthy_habitat_storage_account_key = os.getenv('HEALTHY_HABITAT_AI_STORAGE_ACCO
 
 #resize_images_url = os.getenv('RESIZE_IMAGES_URL')
 
-#sql_database = os.getenv('SQL_DATABASE')
+sql_database = os.getenv('SQL_DATABASE')
 
-#sql_database_password = os.getenv('SQL_DATABASE_PASSWORD')
+sql_database_password = os.getenv('SQL_DATABASE_PASSWORD')
 
-#sql_database_username = os.getenv('SQL_DATABASE_USERNAME')
+sql_database_username = os.getenv('SQL_DATABASE_USERNAME')
 
-#sql_server = os.getenv('SQL_SERVER')
+sql_server = os.getenv('SQL_SERVER')
