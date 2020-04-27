@@ -50,15 +50,7 @@ def get_raster(data_path, container_name, date_of_flight, blob_name):
 
     return raster
 
-def get_latest_iteration_ids(container_name):
-    projects = custom_vision.get_projects()
-
-    projects.sort(key=lambda project: project.name)
-
-    project_ids = [(project.id, project.name) for project in projects if container_name in project.name]
-
-    logging.info('Found Project Ids {}'.format(project_ids))
-
+def get_latest_iteration_ids(project_ids):
     latest_iteration_ids = []
 
     for project_id in project_ids:
@@ -69,9 +61,12 @@ def get_latest_iteration_ids(container_name):
 
             latest_iteration_ids.append(iterations[0])
 
-    logging.info('Found Iteration Ids'.format(latest_iteration_ids))
-
     return latest_iteration_ids
+
+def get_project_ids(container_name):
+    projects = custom_vision.get_projects()
+    projects.sort(key=lambda project: project.name)
+    return [(project.id, project.name) for project in projects if container_name in project.name]
 
 def parse_body(body):
     url = body[0]['data']['url']
@@ -93,11 +88,13 @@ def parse_body(body):
 def score_regions_from_blob(body):
     logging.info('In score_regions_from_blob...')
     url, container_name, date_of_flight, blob_name = parse_body(body)
-    latest_iteration_ids = get_latest_iteration_ids(container_name)
+    project_ids = get_project_ids(container_name)
+    logging.info('Found Project Ids {}'.format(project_ids))
+    latest_iteration_ids = get_latest_iteration_ids(project_ids)
+    logging.info('Found Iteration Ids {}'.format(project_ids))
 
     data_path = os.path.join(os.sep, 'home', 'data') # Using os.sep is a bit naff...
 
-    #if len(latest_iteration_ids) == 2:
     raster = get_raster(data_path, container_name, date_of_flight, blob_name)
 
     raster_height = raster.height
@@ -160,11 +157,15 @@ def score_regions_from_blob(body):
                 project_id = 'd4892285-f0da-466b-9122-8c02cc370013' # Animals
                 iteration_name = 'cannonhill-wurrkeng-animals-Iteration5' # Animals
 
+
                 #logging.info('Creating {0} in {1}...'.format(region_name, project_id))
 
                 #result = custom_vision.create_images_from_files(region_name, buffer, project_id)
 
                 #logging.info(result)
+
+                #result = custom_vision.classify_image(project_id, iteration_name, buffer)
+
 
                 result = custom_vision.detect_image(project_id, iteration_name, buffer)
 
