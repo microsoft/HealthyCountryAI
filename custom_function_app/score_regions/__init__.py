@@ -50,18 +50,13 @@ def get_raster(data_path, container_name, date_of_flight, blob_name):
 
     return raster
 
-def get_latest_iteration_ids(project_ids):
-    latest_iteration_ids = []
-
-    for project_id in project_ids:
-        iterations = custom_vision.get_iterations(project_id[0])
+def get_latest_iteration(project_id):
+    iterations = custom_vision.get_iterations(project_id)
         
-        if len(iterations) > 0:
-            iterations.sort(reverse=True, key=lambda iteration: iteration.last_modified)
-
-            latest_iteration_ids.append(iterations[0])
-
-    return latest_iteration_ids
+    if len(iterations) > 0:
+        return iterations.sort(reverse=True, key=lambda iteration: iteration.last_modified)[0]
+    else:
+        return None
 
 def get_project_ids(container_name):
     projects = custom_vision.get_projects()
@@ -90,8 +85,13 @@ def score_regions_from_blob(body):
     url, container_name, date_of_flight, blob_name = parse_body(body)
     project_ids = get_project_ids(container_name)
     logging.info('Found Project Ids {}'.format(project_ids))
-    latest_iteration_ids = get_latest_iteration_ids(project_ids)
-    logging.info('Found Iteration Ids {}'.format(project_ids))
+
+    latest_iterations = {}
+
+    for project_id in project_ids:
+        latest_iterations[project_id] = get_latest_iteration(project_id)
+
+    logging.info('Found Iterations {}'.format(latest_iterations))
 
     data_path = os.path.join(os.sep, 'home', 'data') # Using os.sep is a bit naff...
 
@@ -150,6 +150,10 @@ def score_regions_from_blob(body):
                 buffer = io.BytesIO()
 
                 Image.fromarray(region).save(buffer, format='JPEG')
+
+                for project_id, iteration in latest_iterations.items():
+                    logging.info(project_id)
+                    logging.info(iteration.name)
                 
                 #project_id = 'd3bbda39-e52f-497b-9ed6-b3f27a63d516' # Habitat
                 #iteration_name = 'ubir-kurrung-habitat-Iteration1' # Habitat
@@ -158,14 +162,7 @@ def score_regions_from_blob(body):
                 iteration_name = 'cannonhill-wurrkeng-animals-Iteration5' # Animals
 
 
-                #logging.info('Creating {0} in {1}...'.format(region_name, project_id))
-
-                #result = custom_vision.create_images_from_files(region_name, buffer, project_id)
-
-                #logging.info(result)
-
                 #result = custom_vision.classify_image(project_id, iteration_name, buffer)
-
 
                 result = custom_vision.detect_image(project_id, iteration_name, buffer)
 
