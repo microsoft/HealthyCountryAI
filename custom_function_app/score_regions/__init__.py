@@ -58,10 +58,10 @@ def get_latest_iteration(project_id):
     else:
         return None
 
-def get_project_ids(container_name):
+def get_projects(container_name):
     projects = custom_vision.get_projects()
     projects.sort(key=lambda project: project.name)
-    return [(project.id, project.name) for project in projects if container_name in project.name]
+    return [project for project in projects if container_name in project.name]
 
 def parse_body(body):
     url = body[0]['data']['url']
@@ -83,12 +83,13 @@ def parse_body(body):
 def score_regions_from_blob(body):
     logging.info('In score_regions_from_blob...')
     url, container_name, date_of_flight, blob_name = parse_body(body)
-    project_ids = get_project_ids(container_name)
-    logging.info('Found Project Ids {}'.format(project_ids))
+    projects = get_projects(container_name)
+    logging.info('Found Projects {}'.format(projects))
 
     latest_iterations = {}
 
-    for project_id in project_ids:
+    for project in projects:
+        project_id = project.id
         latest_iterations[project_id] = get_latest_iteration(project_id)
 
     logging.info('Found Iterations {}'.format(latest_iterations))
