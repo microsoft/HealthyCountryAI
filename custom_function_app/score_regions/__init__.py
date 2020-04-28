@@ -52,7 +52,9 @@ def get_raster(data_path, container_name, date_of_flight, blob_name):
 
 def get_latest_iteration(project_id):
     iterations = custom_vision.get_iterations(project_id)
-        
+
+    logging.info('Found Iteration {}'.format(iterations))
+
     if len(iterations) > 0:
         return iterations.sort(reverse=True, key=lambda iteration: iteration.last_modified)[0]
     else:
@@ -84,7 +86,7 @@ def score_regions_from_blob(body):
     logging.info('In score_regions_from_blob...')
     url, container_name, date_of_flight, blob_name = parse_body(body)
     projects = get_projects(container_name)
-    logging.info('Found Projects {}'.format(projects))
+    logging.info('Found Projects {}'.format([project.id for project in projects]))
 
     latest_iterations = {}
 
