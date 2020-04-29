@@ -153,8 +153,8 @@ def score_regions_from_blob(body):
                 Image.fromarray(region).save(buffer, format='JPEG')
 
                 # Animals
-                project_id = latest_iterations.keys()[0]
-                iteration = latest_iterations.values()[0]
+                project_id = list(latest_iterations.keys())[0]
+                iteration = list(latest_iterations.values())[0]
 
                 if not iteration == None:
                     result = custom_vision.detect_image(project_id, iteration.name, buffer)
@@ -173,8 +173,8 @@ def score_regions_from_blob(body):
                         sql_database.insert_animal_result(date_of_flight, location_of_flight, season, region_name, label, probability, url, latitude, longitude, logging)
 
                 # Habitat
-                project_id = latest_iterations.keys()[1]
-                iteration = latest_iterations.values()[1]
+                project_id = list(latest_iterations.keys())[1]
+                iteration = list(latest_iterations.values())[1]
 
                 if not iteration == None:
                     result = custom_vision.classify_image(project_id, iteration.name, buffer)
