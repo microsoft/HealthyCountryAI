@@ -51,14 +51,11 @@ def get_raster(data_path, container_name, date_of_flight, blob_name):
     return raster
 
 def get_latest_iteration(project_id):
-    logging.info('Project Id {0}'.format(project_id))
-
     iterations = custom_vision.get_iterations(project_id)
 
-    logging.info('Found Iterations {0}'.format(iterations))
-
     if len(iterations) > 0:
-        return iterations.sort(reverse=True, key=lambda iteration: iteration.last_modified)[0]
+        iterations.sort(reverse=True, key=lambda iteration: iteration.last_modified)
+        return iterations[0]
     else:
         return None
 
