@@ -85,7 +85,6 @@ def score_regions_from_blob(body):
     logging.info('In score_regions_from_blob...')
     url, container_name, date_of_flight, blob_name = parse_body(body)
     projects = get_projects(container_name)
-    logging.info('Found Projects {}'.format([project.id for project in projects]))
 
     latest_iterations = {}
 
@@ -153,35 +152,46 @@ def score_regions_from_blob(body):
 
                 Image.fromarray(region).save(buffer, format='JPEG')
 
-                for project_id, iteration in latest_iterations.items():
-                    logging.info(project_id)
-                    logging.info(iteration.name)
+                # Animals
+                project_id = latest_iterations.keys()[0]
+                iteration = latest_iterations.values()[0]
+
+                if not iteration == None:
+                    result = custom_vision.detect_image(project_id, iteration.name, buffer)
+
+                    predictions = result.predictions
+
+                    for prediction in predictions:
+                        logging.info(prediction)
+
+                        location_of_flight = container_name
+                        season = container_name
+                        label = prediction.tag_name
+                        probability = prediction.probability
+                        url = ''
+
+                        sql_database.insert_animal_result(date_of_flight, location_of_flight, season, region_name, label, probability, url, latitude, longitude, logging)
+
+                # Habitat
+                project_id = latest_iterations.keys()[1]
+                iteration = latest_iterations.values()[1]
+
+                if not iteration == None:
+                    result = custom_vision.classify_image(project_id, iteration.name, buffer)
+
+                    predictions = result.predictions
+
+                    for prediction in predictions:
+                        logging.info(prediction)
+
+                        location_of_flight = container_name
+                        season = container_name
+                        label = prediction.tag_name
+                        probability = prediction.probability
+                        url = ''
+
+                        sql_database.insert_habitat_result(date_of_flight, location_of_flight, season, region_name, label, probability, url, latitude, longitude, logging)
                 
-                #project_id = 'd3bbda39-e52f-497b-9ed6-b3f27a63d516' # Habitat
-                #iteration_name = 'ubir-kurrung-habitat-Iteration1' # Habitat
-
-                project_id = 'd4892285-f0da-466b-9122-8c02cc370013' # Animals
-                iteration_name = 'cannonhill-wurrkeng-animals-Iteration5' # Animals
-
-
-                #result = custom_vision.classify_image(project_id, iteration_name, buffer)
-
-                result = custom_vision.detect_image(project_id, iteration_name, buffer)
-
-                predictions = result.predictions
-
-                for prediction in predictions:
-                    logging.info(prediction)
-
-                    location_of_flight = container_name
-                    season = container_name
-                    label = prediction.tag_name
-                    probability = prediction.probability
-                    url = ''
-                    bounding_box = ''
-
-                    sql_database.insert_animal_result(date_of_flight, location_of_flight, season, region_name, label, probability, url, latitude, longitude, bounding_box, logging)
-
                 if os.path.exists(region_name_path):
                     os.remove(region_name_path)
 
