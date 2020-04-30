@@ -110,8 +110,8 @@ def score_regions_from_blob(body):
 
     count = 0
 
-    for y in range(2000, raster_height, height):
-        for x in range(2000, raster_width, width):
+    for y in range(0, raster_height, height):
+        for x in range(0, raster_width, width):
             if count < 10:
                 logging.info(x)
                 logging.info(y)
