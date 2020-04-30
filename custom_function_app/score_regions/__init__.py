@@ -152,22 +152,22 @@ def score_regions_from_blob(body):
 
                 buffer = io.BytesIO()
 
-                blob_name = '{0}/{1}/{2}'.format(container_name, date_of_flight, region_name)
+                out_blob_name = '{0}/{1}/{2}'.format(container_name, date_of_flight, region_name)
 
                 # Write to Storage...
                 azure_storage.blob_service_create_blob_from_bytes(common.healthy_habitat_storage_account_name,
                     common.healthy_habitat_storage_account_key,
                     'resized',
-                    blob_name,
+                    out_blob_name,
                     buffer.getvalue())
 
                 #Create URL to blob...
                 sas_url = azure_storage.blob_service_generate_blob_shared_access_signature(common.healthy_habitat_storage_account_name,
                     common.healthy_habitat_storage_account_key,
                     'resized',
-                    blob_name)
+                    out_blob_name)
 
-                blob_url = 'https://{0}.blob.core.windows.net/{1}/{2}?{3}'.format(common.healthy_habitat_storage_account_name, container_name, blob_name, sas_url)
+                blob_url = 'https://{0}.blob.core.windows.net/{1}/{2}?{3}'.format(common.healthy_habitat_storage_account_name, 'resized', out_blob_name, sas_url)
 
                 Image.fromarray(region).save(buffer, format='JPEG')
 
