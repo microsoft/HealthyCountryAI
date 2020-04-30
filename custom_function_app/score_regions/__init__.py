@@ -156,7 +156,11 @@ def score_regions_from_blob(body):
                 project_id = list(latest_iterations.keys())[0]
                 iteration = list(latest_iterations.values())[0]
 
-                if not iteration == None:
+                if iteration != None:
+                    logging.info('Scoring animals...')
+                    logging.info('Using Project Id {0}'.format(project_id))
+                    logging.info('Using Iteration Name {0}'.format(iteration.name))
+
                     result = custom_vision.detect_image(project_id, iteration.name, buffer)
 
                     predictions = result.predictions
@@ -171,12 +175,20 @@ def score_regions_from_blob(body):
                         url = ''
 
                         sql_database.insert_animal_result(date_of_flight, location_of_flight, season, region_name, label, probability, url, latitude, longitude, logging)
+                else:
+                    logging.info('Skipping scoring animals as there is no Iteration to use.')
 
                 # Habitat
+                logging.info('Scoring habitat...')
+
                 project_id = list(latest_iterations.keys())[1]
                 iteration = list(latest_iterations.values())[1]
 
-                if not iteration == None:
+                if iteration != None:
+                    logging.info('Scoring habitat...')
+                    logging.info('Using Project Id {0}'.format(project_id))
+                    logging.info('Using Iteration Name {0}'.format(iteration.name))
+
                     result = custom_vision.classify_image(project_id, iteration.name, buffer)
 
                     predictions = result.predictions
@@ -191,7 +203,9 @@ def score_regions_from_blob(body):
                         url = ''
 
                         sql_database.insert_habitat_result(date_of_flight, location_of_flight, season, region_name, label, probability, url, latitude, longitude, logging)
-                
+                else:
+                    logging.info('Skipping scoring animals as there is no Iteration to use.')
+
                 if os.path.exists(region_name_path):
                     os.remove(region_name_path)
 
