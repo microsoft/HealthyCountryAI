@@ -137,6 +137,7 @@ def score_regions_from_blob(body):
 
                 logging.info(listdir(data_path))
 
+                # Get Latitude / Longitude...
                 y1 = (y + height) / 2
                 x1 = (x + width) / 2
                 coordinates = raster.xy(x1, y1)
@@ -145,10 +146,28 @@ def score_regions_from_blob(body):
 
                 logging.info('{0} {1}'.format(latitude, longitude))
 
+                # Open Window...
                 region = cv2.imread(region_name_path)
                 region = cv2.cvtColor(region, cv2.COLOR_BGR2RGB)
 
                 buffer = io.BytesIO()
+
+                blob_name = '{0}/{1}'.format(date_of_flight, region_name)
+
+                # Write to Storage...
+                azure_storage.blob_service_create_blob_from_bytes(common.healthy_habitat_storage_account_name,
+                    common.healthy_habitat_storage_account_key,
+                    'resized',
+                    blob_name,
+                    buffer.getvalue())
+
+                #Create URL to blob...
+                sas_url = azure_storage.blob_service_generate_blob_shared_access_signature(common.healthy_habitat_storage_account_name,
+                    common.healthy_habitat_storage_account_key,
+                    'resized',
+                    blob_name)
+
+                blob_url = 'https://{0}.blob.core.windows.net/{1}/{2}?{3}'.format('', container_name, blob_name, sas_url)
 
                 Image.fromarray(region).save(buffer, format='JPEG')
 
@@ -172,9 +191,8 @@ def score_regions_from_blob(body):
                         season = container_name
                         label = prediction.tag_name
                         probability = prediction.probability
-                        url = ''
 
-                        sql_database.insert_animal_result(date_of_flight, location_of_flight, season, region_name, label, probability, url, latitude, longitude, logging)
+                        sql_database.insert_animal_result(date_of_flight, location_of_flight, season, region_name, label, probability, blob_url, latitude, longitude, logging)
                 else:
                     logging.info('Skipping scoring animals as there is no Iteration to use.')
 
@@ -200,7 +218,7 @@ def score_regions_from_blob(body):
                         probability = prediction.probability
                         url = ''
 
-                        sql_database.insert_habitat_result(date_of_flight, location_of_flight, season, region_name, label, probability, url, latitude, longitude, logging)
+                        sql_database.insert_habitat_result(date_of_flight, location_of_flight, season, region_name, label, probability, blob_url, latitude, longitude, logging)
                 else:
                     logging.info('Skipping scoring animals as there is no Iteration to use.')
 
