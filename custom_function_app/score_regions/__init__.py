@@ -152,7 +152,7 @@ def score_regions_from_blob(body):
 
                 buffer = io.BytesIO()
 
-                blob_name = '{0}/{1}'.format(date_of_flight, region_name)
+                blob_name = '{0}/{1}/{2}'.format(container_name, date_of_flight, region_name)
 
                 # Write to Storage...
                 azure_storage.blob_service_create_blob_from_bytes(common.healthy_habitat_storage_account_name,
@@ -167,7 +167,7 @@ def score_regions_from_blob(body):
                     'resized',
                     blob_name)
 
-                blob_url = 'https://{0}.blob.core.windows.net/{1}/{2}?{3}'.format('', container_name, blob_name, sas_url)
+                blob_url = 'https://{0}.blob.core.windows.net/{1}/{2}?{3}'.format(common.healthy_habitat_storage_account_name, container_name, blob_name, sas_url)
 
                 Image.fromarray(region).save(buffer, format='JPEG')
 
@@ -216,11 +216,10 @@ def score_regions_from_blob(body):
                         season = container_name
                         label = prediction.tag_name
                         probability = prediction.probability
-                        url = ''
 
                         sql_database.insert_habitat_result(date_of_flight, location_of_flight, season, region_name, label, probability, blob_url, latitude, longitude, logging)
                 else:
-                    logging.info('Skipping scoring animals as there is no Iteration to use.')
+                    logging.info('Skipping scoring habitat as there is no Iteration to use.')
 
                 if os.path.exists(region_name_path):
                     os.remove(region_name_path)
