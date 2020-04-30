@@ -112,123 +112,120 @@ def score_regions_from_blob(body):
 
     for y in range(0, raster_height, height):
         for x in range(0, raster_width, width):
-            if count < 10:
-                logging.info(x)
-                logging.info(y)
+            logging.info(x)
+            logging.info(y)
 
-                region_name = '{0}_Region_{1}.JPG'.format(blob_name.split('.')[0], count)
+            region_name = '{0}_Region_{1}.JPG'.format(blob_name.split('.')[0], count)
 
-                region_name_path = os.path.join(data_path, region_name)
+            region_name_path = os.path.join(data_path, region_name)
 
-                logging.info(region_name_path)
+            logging.info(region_name_path)
 
-                window = raster.read(window=rasterio.windows.Window(x, y, width, height))
+            window = raster.read(window=rasterio.windows.Window(x, y, width, height))
 
-                profile = {
-                    "driver": "JPEG",
-                    "count": 4,
-                    "height": height,
-                    "width": width,
-                    'dtype': 'uint8'
-                }
-                
-                with rasterio.open(region_name_path, 'w', **profile) as out:
-                    out.write(window)
+            profile = {
+                "driver": "JPEG",
+                "count": 4,
+                "height": height,
+                "width": width,
+                'dtype': 'uint8'
+            }
+            
+            with rasterio.open(region_name_path, 'w', **profile) as out:
+                out.write(window)
 
-                logging.info(listdir(data_path))
+            logging.info(listdir(data_path))
 
-                # Get Latitude / Longitude...
-                y1 = (y + height) / 2
-                x1 = (x + width) / 2
-                coordinates = raster.xy(x1, y1)
-                latitude = coordinates[0]
-                longitude = coordinates[1]
+            # Get Latitude / Longitude...
+            y1 = (y + height) / 2
+            x1 = (x + width) / 2
+            coordinates = raster.xy(x1, y1)
+            latitude = coordinates[0]
+            longitude = coordinates[1]
 
-                logging.info('{0} {1}'.format(latitude, longitude))
+            logging.info('{0} {1}'.format(latitude, longitude))
 
-                # Open Window...
-                region = cv2.imread(region_name_path)
-                region = cv2.cvtColor(region, cv2.COLOR_BGR2RGB)
+            # Open Window...
+            region = cv2.imread(region_name_path)
+            region = cv2.cvtColor(region, cv2.COLOR_BGR2RGB)
 
-                buffer = io.BytesIO()
+            buffer = io.BytesIO()
 
-                out_blob_name = '{0}/{1}/{2}'.format(container_name, date_of_flight, region_name)
+            out_blob_name = '{0}/{1}/{2}'.format(container_name, date_of_flight, region_name)
 
-                # Write to Storage...
-                azure_storage.blob_service_create_blob_from_bytes(common.healthy_habitat_storage_account_name,
-                    common.healthy_habitat_storage_account_key,
-                    'resized',
-                    out_blob_name,
-                    buffer.getvalue())
+            # Write to Storage...
+            azure_storage.blob_service_create_blob_from_bytes(common.healthy_habitat_storage_account_name,
+                common.healthy_habitat_storage_account_key,
+                'resized',
+                out_blob_name,
+                buffer.getvalue())
 
-                #Create URL to blob...
-                sas_url = azure_storage.blob_service_generate_blob_shared_access_signature(common.healthy_habitat_storage_account_name,
-                    common.healthy_habitat_storage_account_key,
-                    'resized',
-                    out_blob_name)
+            #Create URL to blob...
+            sas_url = azure_storage.blob_service_generate_blob_shared_access_signature(common.healthy_habitat_storage_account_name,
+                common.healthy_habitat_storage_account_key,
+                'resized',
+                out_blob_name)
 
-                blob_url = 'https://{0}.blob.core.windows.net/{1}/{2}?{3}'.format(common.healthy_habitat_storage_account_name, 'resized', out_blob_name, sas_url)
+            blob_url = 'https://{0}.blob.core.windows.net/{1}/{2}?{3}'.format(common.healthy_habitat_storage_account_name, 'resized', out_blob_name, sas_url)
 
-                Image.fromarray(region).save(buffer, format='JPEG')
+            Image.fromarray(region).save(buffer, format='JPEG')
 
-                # Animals
-                project_id = list(latest_iterations.keys())[0]
-                iteration = list(latest_iterations.values())[0]
+            # Animals
+            project_id = list(latest_iterations.keys())[0]
+            iteration = list(latest_iterations.values())[0]
 
-                if iteration != None:
-                    logging.info('Scoring animals...')
-                    logging.info('Using Project Id {0}'.format(project_id))
-                    logging.info('Using Iteration Publish Name {0}'.format(iteration.publish_name))
+            if iteration != None:
+                logging.info('Scoring animals...')
+                logging.info('Using Project Id {0}'.format(project_id))
+                logging.info('Using Iteration Publish Name {0}'.format(iteration.publish_name))
 
-                    result = custom_vision.detect_image(project_id, iteration.publish_name, buffer)
+                result = custom_vision.detect_image(project_id, iteration.publish_name, buffer)
 
-                    predictions = result.predictions
+                predictions = result.predictions
 
-                    for prediction in predictions:
-                        logging.info(prediction)
+                for prediction in predictions:
+                    logging.info(prediction)
 
-                        location_of_flight = container_name
-                        season = container_name
-                        label = prediction.tag_name
-                        probability = prediction.probability
+                    location_of_flight = container_name
+                    season = container_name
+                    label = prediction.tag_name
+                    probability = prediction.probability
 
-                        sql_database.insert_animal_result(date_of_flight, location_of_flight, season, region_name, label, probability, blob_url, latitude, longitude, logging)
-                else:
-                    logging.info('Skipping scoring animals as there is no Iteration to use.')
+                    sql_database.insert_animal_result(date_of_flight, location_of_flight, season, region_name, label, probability, blob_url, latitude, longitude, logging)
+            else:
+                logging.info('Skipping scoring animals as there is no Iteration to use.')
 
-                # Habitat
-                project_id = list(latest_iterations.keys())[1]
-                iteration = list(latest_iterations.values())[1]
+            # Habitat
+            project_id = list(latest_iterations.keys())[1]
+            iteration = list(latest_iterations.values())[1]
 
-                if iteration != None:
-                    logging.info('Scoring habitat...')
-                    logging.info('Using Project Id {0}'.format(project_id))
-                    logging.info('Using Iteration Publish Name {0}'.format(iteration.publish_name))
+            if iteration != None:
+                logging.info('Scoring habitat...')
+                logging.info('Using Project Id {0}'.format(project_id))
+                logging.info('Using Iteration Publish Name {0}'.format(iteration.publish_name))
 
-                    result = custom_vision.classify_image(project_id, iteration.publish_name, buffer)
+                result = custom_vision.classify_image(project_id, iteration.publish_name, buffer)
 
-                    predictions = result.predictions
+                predictions = result.predictions
 
-                    for prediction in predictions:
-                        logging.info(prediction)
+                for prediction in predictions:
+                    logging.info(prediction)
 
-                        location_of_flight = container_name
-                        season = container_name
-                        label = prediction.tag_name
-                        probability = prediction.probability
+                    location_of_flight = container_name
+                    season = container_name
+                    label = prediction.tag_name
+                    probability = prediction.probability
 
-                        sql_database.insert_habitat_result(date_of_flight, location_of_flight, season, region_name, label, probability, blob_url, latitude, longitude, logging)
-                else:
-                    logging.info('Skipping scoring habitat as there is no Iteration to use.')
+                    sql_database.insert_habitat_result(date_of_flight, location_of_flight, season, region_name, label, probability, blob_url, latitude, longitude, logging)
+            else:
+                logging.info('Skipping scoring habitat as there is no Iteration to use.')
 
-                if os.path.exists(region_name_path):
-                    os.remove(region_name_path)
+            if os.path.exists(region_name_path):
+                os.remove(region_name_path)
 
-                count += 1
+            count += 1
 
-        return 'Success'
-    # else:
-    #     return ''
+    return 'Success'
 
 def get_response(body):
     logging.info('In get_response...')
