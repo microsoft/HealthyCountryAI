@@ -159,9 +159,9 @@ def score_regions_from_blob(body):
                 if iteration != None:
                     logging.info('Scoring animals...')
                     logging.info('Using Project Id {0}'.format(project_id))
-                    logging.info('Using Iteration Name {0}'.format(iteration.name))
+                    logging.info('Using Iteration Publish Name {0}'.format(iteration.publish_name))
 
-                    result = custom_vision.detect_image(project_id, iteration.name, buffer)
+                    result = custom_vision.detect_image(project_id, iteration.publish_name, buffer)
 
                     predictions = result.predictions
 
@@ -179,17 +179,15 @@ def score_regions_from_blob(body):
                     logging.info('Skipping scoring animals as there is no Iteration to use.')
 
                 # Habitat
-                logging.info('Scoring habitat...')
-
                 project_id = list(latest_iterations.keys())[1]
                 iteration = list(latest_iterations.values())[1]
 
                 if iteration != None:
                     logging.info('Scoring habitat...')
                     logging.info('Using Project Id {0}'.format(project_id))
-                    logging.info('Using Iteration Name {0}'.format(iteration.name))
+                    logging.info('Using Iteration Publish Name {0}'.format(iteration.publish_name))
 
-                    result = custom_vision.classify_image(project_id, iteration.name, buffer)
+                    result = custom_vision.classify_image(project_id, iteration.publish_name, buffer)
 
                     predictions = result.predictions
 
