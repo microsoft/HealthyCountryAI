@@ -186,8 +186,8 @@ def score_regions_from_blob(body):
                 for prediction in predictions:
                     logging.info(prediction)
 
-                    location_of_flight = container_name
-                    season = container_name
+                    location_of_flight = container_name.split('-')[0]
+                    season = container_name.split('-')[1]
                     label = prediction.tag_name
                     probability = prediction.probability
 
