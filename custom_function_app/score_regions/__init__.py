@@ -139,7 +139,7 @@ def score_regions_from_blob(body):
             # Get Latitude / Longitude...
             y1 = (y + height) / 2
             x1 = (x + width) / 2
-            coordinates = raster.xy(x1, y1)
+            coordinates = raster.xy(y1, x1)
             latitude = coordinates[0]
             longitude = coordinates[1]
 
