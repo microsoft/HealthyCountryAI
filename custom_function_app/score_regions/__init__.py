@@ -151,6 +151,8 @@ def score_regions_from_blob(body):
 
             buffer = io.BytesIO()
 
+            Image.fromarray(region).save(buffer, format='JPEG')
+
             out_blob_name = '{0}/{1}/{2}'.format(container_name, date_of_flight, region_name)
 
             # Write to Storage...
@@ -167,8 +169,6 @@ def score_regions_from_blob(body):
                 out_blob_name)
 
             blob_url = 'https://{0}.blob.core.windows.net/{1}/{2}?{3}'.format(common.healthy_habitat_storage_account_name, 'resized', out_blob_name, sas_url)
-
-            Image.fromarray(region).save(buffer, format='JPEG')
 
             # Animals
             project_id = list(latest_iterations.keys())[0]
