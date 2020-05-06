@@ -121,7 +121,7 @@ def score_regions_from_blob(body):
 
             logging.info(region_name_path)
 
-            window = raster.read(window=rasterio.windows.Window(x, y, width, height))
+            window = raster.read(indexes=[1, 2, 3], window=rasterio.windows.Window(x, y, width, height))
 
             profile = {
                 "driver": "JPEG",
