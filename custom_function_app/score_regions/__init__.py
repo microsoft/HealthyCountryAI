@@ -97,6 +97,7 @@ def score_regions_from_blob(body):
     data_path = os.path.join(os.sep, 'home', 'data') # Using os.sep is a bit naff...
 
     raster = get_raster(data_path, container_name, date_of_flight, blob_name)
+    raster = raster.read([1,2,3])
 
     raster_height = raster.height
     raster_width = raster.width
@@ -125,7 +126,7 @@ def score_regions_from_blob(body):
 
             profile = {
                 "driver": "JPEG",
-                "count": 4,
+                "count": 3,
                 "height": height,
                 "width": width,
                 'dtype': 'uint8'
