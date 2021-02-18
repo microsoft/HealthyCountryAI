@@ -138,8 +138,8 @@ ipython kernel install --user
 
 Two options are provided:
 
-* A [fast.ai Jupyter notebook](./notebooks/ubir-wurrkeng-fastai.ipynb), and
-* An [ML Pipeline](./notebooks/qubvel-segmentation_models-U-Net-ML-Pipeline.ipynb) based on [github.com/qubvel/segmentation_models](https://github.com/qubvel/segmentation_models)
+* A [fast.ai Jupyter notebook](/v1/notebooks/ubir-wurrkeng-fastai.ipynb), and
+* An [ML Pipeline](/v1//notebooks/qubvel-segmentation_models-U-Net-ML-Pipeline.ipynb) based on [github.com/qubvel/segmentation_models](https://github.com/qubvel/segmentation_models)
 
 Both the fast.ai Jupyter notebook and the ML Pipeline use data prepared with the data preparation notebook and [Labelbox](https://labelbox.com).
 
@@ -159,9 +159,9 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 # Contact
 
 For more details or help deploying, contact:
-* [Tianji Dickens](Tianji.Dickens@microsoft.com), Microsoft
-* [Dr Justin Perry]( Justin.perry@csiro.au), CSIRO
-* [Steve van Bodegraven](Steve.VanBodegraven@microsoft.com), Microsoft
+* [Tianji Dickens](mailto:Tianji.Dickens@microsoft.com), Microsoft
+* [Dr Justin Perry](mailto:Justin.perry@csiro.au), CSIRO
+* [Steve van Bodegraven](mailto:Steve.VanBodegraven@microsoft.com), Microsoft
 
 # License
 
