@@ -124,7 +124,7 @@ The scored data is stored in a SQL database which is linked to a Power BI report
 * Install [Azure Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/)
 * Install [Power BI Desktop](https://powerbi.microsoft.com/en-us/desktop/)
 * Install [Anaconda](https://docs.anaconda.com/anaconda/install/)
-* Clone [github.com/svanbodegraven/HealthyHabitatAI.git](https://github.com/svanbodegraven/HealthyHabitatAI.git)
+* Clone [https://github.com/microsoft/HealthyCountryAI.git](https://github.com/microsoft/HealthyCountryAI.git)
 * Configure a [local development environment](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-configure-environment#local)
 
 ```
