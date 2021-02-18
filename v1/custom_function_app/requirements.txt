@@ -1,0 +1,9 @@
+azure-functions
+azure-cognitiveservices-vision-customvision
+azure-storage
+imageio
+numpy
+opencv-python
+Pillow
+pyodbc
+rasterio

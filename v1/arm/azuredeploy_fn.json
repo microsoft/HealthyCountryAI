@@ -1,0 +1,133 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "planName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name to use when deploying the app service plan."
+            }
+        },
+        "functionAppName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name to use when deploying the function app. This name must be globally unique."
+            }
+        },
+        "location": {
+            "type": "string",
+            "minLength": 1,
+            "defaultValue": "australiaeast",
+            "metadata": {
+                "description": "The location in which to deploy the resources."
+            }
+        },
+        "appInsightsInstrumentationKey": {
+            "type": "string",
+            "metadata": {
+                "description": "The instrumentation key to use when sending telemetry to Application Insights."
+            }
+        },
+        "storageAccountConnectionString": {
+            "type": "string",
+            "metadata": {
+                "description": "The connection string to the storage account that contains the Azure Functions runtime data."
+            }
+        },
+        "dataBlobAccountName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the storage account that contains the incoming image files."
+            }
+        },
+        "dataBlobAccountKey": {
+            "type": "string",
+            "metadata": {
+                "description": "The key for the storage account that contains the incoming image files."
+            }
+        },
+        "customVisionEndpoint": {
+            "type": "string",
+            "metadata": {
+                "description": "The endpoint for the Custom Vision service that should process the tiled images for training purposes."
+            }
+        },
+        "customVisionTrainingKey": {
+            "type": "string",
+            "metadata": {
+                "description": "The key for the Custom Vision service that should process the tiled images for training purposes."
+            }
+        }
+    },
+    "resources": [
+        {
+            "name": "[parameters('planName')]",
+            "type": "Microsoft.Web/serverFarms",
+            "apiVersion": "2018-02-01",
+            "location": "[parameters('location')]",
+            "kind": "functionapp",
+            "sku": {
+                "tier": "Dynamic",
+                "name": "Y1"
+            },
+            "properties": {
+                "reserved": true
+            }
+        },
+        {
+            "name": "[parameters('functionAppName')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2016-03-01",
+            "location": "[resourceGroup().location]",
+            "kind": "functionapp,linux",
+            "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('planName'))]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[parameters('storageAccountConnectionString')]"
+                        },
+                        {
+                            "name": "AzureWebJobsDashboard",
+                            "value": "[parameters('storageAccountConnectionString')]"
+                        },
+                        {
+                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                            "value": "[parameters('appInsightsInstrumentationKey')]"
+                        },
+                        {
+                            "name": "FUNCTIONS_WORKER_RUNTIME",
+                            "value": "python"
+                        },
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~2"
+                        },
+                        {
+                            "name": "BLOB_ACCOUNT_NAME",
+                            "value": "[parameters('dataBlobAccountName')]"
+                        },
+                        {
+                            "name": "BLOB_ACCOUNT_KEY",
+                            "value": "[parameters('dataBlobAccountKey')]"
+                        },
+                        {
+                            "name": "CUSTOM_VISION_ENDPOINT",
+                            "value": "[parameters('customVisionEndpoint')]"
+                        },
+                        {
+                            "name": "CUSTOM_VISION_TRAINING_KEY",
+                            "value": "[parameters('customVisionTrainingKey')]"
+                        }
+                    ]
+                },
+                "reserved": true,
+                "linuxFxVersion": "DOCKER|mcr.microsoft.com/azure-functions/python:2.0-python3.6-appservice"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverFarms', parameters('planName'))]"
+            ]
+        }
+    ]
+}

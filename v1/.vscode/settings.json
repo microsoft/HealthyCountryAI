@@ -1,0 +1,8 @@
+{
+    "python.pythonPath": "C:\\Users\\stvanbod\\.conda\\envs\\HealthyHabitat\\python.exe",
+    "azureFunctions.deploySubpath": "src/src.zip",
+    "azureFunctions.projectLanguage": "Python",
+    "azureFunctions.projectRuntime": "~2",
+    "debug.internalConsoleOptions": "neverOpen",
+    "azureFunctions.preDeployTask": "func: pack"
+}

@@ -1,0 +1,50 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspaceName": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "australiaeast"
+        },
+        "storageAccountId": {
+            "type": "string"
+        },
+        "keyVaultId": {
+            "type": "string"
+        },
+        "applicationInsightsId": {
+            "type": "string"
+        },
+        "containerRegistryId": {
+            "type": "string"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.MachineLearningServices/workspaces",
+            "apiVersion": "2019-05-01",
+            "name": "[parameters('workspaceName')]",
+            "location": "[parameters('location')]",
+            "identity": {
+                "type": "systemAssigned"
+            },
+            "properties": {
+                "friendlyName": "[parameters('workspaceName')]",
+                "keyVault": "[parameters('keyVaultId')]",
+                "applicationInsights": "[parameters('applicationInsightsId')]",
+                "containerRegistry": "[parameters('containerRegistryId')]",
+                "storageAccount": "[parameters('storageAccountId')]"
+            }
+        }
+    ],
+    "outputs": {
+        "workspaceId": {
+            "type": "string",
+            "value": "[resourceId('Microsoft.MachineLearningServices/workspaces', parameters('workspaceName'))]"
+        }
+    }
+}
