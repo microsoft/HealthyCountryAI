@@ -11,7 +11,7 @@ The three models are:
 * Magpie Geese (object detection, 304 &times; 228 tiles) (Custom Vision)
 * Para grass (semantic segmentation) (Azure Machine Learning Service)
 
-![](Architecture.jpg)
+![](/v1/Architecture.jpg)
 
 ## Responsible AI and ethical data governance
 
@@ -35,7 +35,7 @@ The rangers and Traditional Owners, Bininj, selected several sites based on impo
 
 Rangers separate the photos into folders for each site and each survey. An [https://github.com/microsoft/HealthyCountryAI/tree/master/app/Release](application) is installed on the ranger's PC; this application depicts the six seasons defined by environmental indicators. Rangers select the files from the site folders they created and drag the files into the season that Bininj Traditional Owners use to monitor and manage this area. The app prompts the ranger to select a site from a list and then prompts the user to select the type of photographs (animal or habitat). Once the site and type are selected, the app automatically synchronizes the data to Azure Storage and creates a standardised file structure for each site (site-season-type-datetime).
 
-<img src="app/HealthyHabitat/Images/SeasonalWheel.png" width=500/><br/>
+<img src="/v1/app/HealthyHabitat/Images/SeasonalWheel.png" width=500/><br/>
 
 One storage account is used and subfolders are created to differentiate among sites, seasons, survey times, and model types. Files are stored as blobs. Data is automatically divided into containers named using the combination of *site* and *season*, matching the section of the seasonal wheel images were dragged onto, for example:
 
@@ -103,7 +103,7 @@ Despite the user-friendly labelling process, it is still difficult to categorise
 
 A useful feature in LabelBox is that the user can zoom in to an area and partially enclose a particular category, then add to the polygon by using overlapping polygons. This allows more detailed labelling to occur.   Using this method it is also possible to enclose the edges of a category, label other categories within the enclosed area, and then use the fill tool to easily label the dominant category.  
 
-![](app/HealthyHabitat/Images/labelBox.PNG)
+![](/v1/app/HealthyHabitat/Images/labelBox.PNG)
 
 <i>Example of LabelBox with overlapping habitat types. The remaining category (water) can be easily labelled with the fill tool (paint drop icon).</i>
 
@@ -115,7 +115,7 @@ The main challenge using this approach is to decide how many categories to label
 
 The scored data is stored in a SQL database which is linked to a Power BI report.  The SQL server contains links to the resized photograph and the scored results of the Custom Vision models (i.e., the percentage of each habitat type and count of each animal).
 
-![](Dashboard_paragrass.PNG)
+![](/v1/Dashboard_paragrass.PNG)
 
 # Running the tools
 
