@@ -159,6 +159,7 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 # Contact
 
 For more details or help deploying, contact:
+* [Dr Cathy Robinson](https://people.csiro.au/R/C/Catherine-Robinson), CSIRO
 * [Tianji Dickens](mailto:Tianji.Dickens@microsoft.com), Microsoft
 * [Dr Justin Perry](mailto:Justin.perry@csiro.au), CSIRO
 * [Steve van Bodegraven](mailto:Steve.VanBodegraven@microsoft.com), Microsoft
